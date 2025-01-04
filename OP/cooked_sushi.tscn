@@ -1,0 +1,107 @@
+[gd_scene load_steps=16 format=3 uid="uid://6gbix6eiocdp"]
+
+[ext_resource type="Script" path="res://OP/cooked_sushi.gd" id="1_bqh2h"]
+[ext_resource type="Texture2D" uid="uid://l4vjael8iiwm" path="res://OP/explode_fish_assets/ciagrette.png" id="2_vhgy6"]
+[ext_resource type="Texture2D" uid="uid://dyiu2g4oyes15" path="res://OP/explode_fish_assets/broken_rice_L.png" id="3_xoniw"]
+[ext_resource type="Texture2D" uid="uid://f31ggcigs7mi" path="res://OP/explode_fish_assets/broken_rice_M.png" id="4_ys6sl"]
+[ext_resource type="Texture2D" uid="uid://d07ivavi2mbc3" path="res://OP/explode_fish_assets/broken_rice_S.png" id="5_sqsff"]
+[ext_resource type="Texture2D" uid="uid://byo0u0voenvhi" path="res://OP/explode_fish_assets/cooked fish.png" id="6_qpick"]
+
+[sub_resource type="Curve" id="Curve_8uc0d"]
+_data = [Vector2(0, 0.235633), 0.0, 0.0, 0, 0, Vector2(0.461394, 0.44331), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_uv1o3"]
+curve = SubResource("Curve_8uc0d")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dgrk4"]
+particle_flag_disable_z = true
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 98, 0)
+scale_min = 0.5
+scale_max = 1.5
+alpha_curve = SubResource("CurveTexture_uv1o3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_c7v27"]
+particle_flag_disable_z = true
+angle_min = -242.8
+angle_max = 242.8
+spread = 95.792
+initial_velocity_min = 30.0
+initial_velocity_max = 200.0
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fcfjd"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 250.0
+gravity = Vector3(0, 98, 0)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_n3v4l"]
+particle_flag_disable_z = true
+angle_min = -180.0
+angle_max = 180.0
+spread = 180.0
+initial_velocity_min = 100.0
+initial_velocity_max = 500.0
+gravity = Vector3(0, 98, 0)
+
+[sub_resource type="Curve" id="Curve_oy6to"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.589454, 0.728866), -0.676761, -0.676761, 0, 0, Vector2(1, 0), -1.48711, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_ub7x0"]
+curve = SubResource("Curve_oy6to")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_2wrkj"]
+particle_flag_disable_z = true
+angle_min = -50.0
+angle_max = 50.0
+direction = Vector3(0, -100, 0)
+initial_velocity_min = 120.0
+initial_velocity_max = 180.0
+gravity = Vector3(0, 98, 0)
+alpha_curve = SubResource("CurveTexture_ub7x0")
+
+[node name="CookedSushi" type="Node2D"]
+script = ExtResource("1_bqh2h")
+
+[node name="Smoke" type="GPUParticles2D" parent="."]
+emitting = false
+process_material = SubResource("ParticleProcessMaterial_dgrk4")
+texture = ExtResource("2_vhgy6")
+one_shot = true
+
+[node name="RiceBig" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 2
+process_material = SubResource("ParticleProcessMaterial_c7v27")
+texture = ExtResource("3_xoniw")
+one_shot = true
+
+[node name="RiceMedium" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 30
+process_material = SubResource("ParticleProcessMaterial_fcfjd")
+texture = ExtResource("4_ys6sl")
+one_shot = true
+
+[node name="RiceSmall" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 100
+process_material = SubResource("ParticleProcessMaterial_n3v4l")
+texture = ExtResource("5_sqsff")
+one_shot = true
+
+[node name="CookedFish" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 1
+process_material = SubResource("ParticleProcessMaterial_2wrkj")
+texture = ExtResource("6_qpick")
+one_shot = true
+visibility_rect = Rect2(-500, -500, 1000, 1000)
