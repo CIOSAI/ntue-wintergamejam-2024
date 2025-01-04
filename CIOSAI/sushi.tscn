@@ -1,0 +1,82 @@
+[gd_scene load_steps=5 format=3 uid="uid://c10f3x6so1eik"]
+
+[ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/arrow-fat-right-fill.svg" id="1_t15jc"]
+[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/circle.svg" id="2_vn6xo"]
+
+[sub_resource type="GDScript" id="GDScript_538en"]
+script/source = "extends Sprite2D
+
+signal continued
+
+var on_road:Line2D
+var perc:float = 0.0
+var food:int = 0 :
+	set(i):
+		food = i
+		%Food.self_modulate = Color.RED if i==0 else Color.BLUE
+var halted:bool = false : 
+	set(b):
+		halted = b
+		modulate = Color.LIGHT_GRAY if b else Color.WHITE
+		%ContinueButton.release_focus()
+		%ContinueButton.visible = b
+		if not b: continued.emit()
+
+func _ready():
+	food = food
+
+func drive():
+	var a = on_road.points[0]
+	var b = on_road.points[1]
+	
+	position = lerp(position, lerp(a, b, perc), .5)
+	rotation = lerp_angle(rotation, (b-a).angle(), .3)
+
+func _process(delta):
+	%ContinueButton.global_position = global_position + Vector2.UP * 50
+	if on_road: 
+		drive()
+
+func _on_continue_button_pressed():
+	halted = false
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_iai32"]
+
+[node name="Sushi" type="Sprite2D"]
+scale = Vector2(2, 2)
+texture = ExtResource("1_t15jc")
+script = SubResource("GDScript_538en")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_iai32")
+
+[node name="Food" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0, 0, 1, 1)
+scale = Vector2(0.015, 0.015)
+texture = ExtResource("2_vn6xo")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ContinueButton" type="Button" parent="CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -608.0
+offset_top = -439.0
+offset_right = -568.0
+offset_bottom = -408.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "繼續"
+
+[connection signal="pressed" from="CanvasLayer/ContinueButton" to="." method="_on_continue_button_pressed"]

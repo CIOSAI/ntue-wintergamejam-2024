@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=3 uid="uid://bs8vbh1bgj1x2"]
+
+[ext_resource type="Texture2D" uid="uid://ct3vrpl5bhgpu" path="res://CIOSAI/Speech_bubble.svg.png" id="1_d0bwt"]
+[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/circle.svg" id="2_ff2k2"]
+
+[sub_resource type="GDScript" id="GDScript_awwuy"]
+script/source = "extends Node2D
+
+signal eaten(correct: bool)
+
+var food:int = 0 :
+	set(i):
+		food = i
+		%Want.self_modulate = Color.RED if i==0 else Color.BLUE
+var coll:Area2D
+var sprite:Sprite2D
+
+func _ready():
+	if has_node(\"sprite\"):
+		sprite = get_node(\"sprite\")
+	else:
+		push_error(\"沒有客人圖案(名字要取叫sprite)\")
+	if has_node(\"coll\"):
+		coll = get_node(\"coll\")
+	else:
+		push_error(\"沒有客人碰撞(名字要取叫coll)\")
+	
+	coll.area_entered.connect(func(sushi):
+		eaten.emit(sushi.get_parent().food == food)
+		sushi.get_parent().queue_free()
+	)
+	
+	food = food
+"
+
+[node name="Customer" type="Node2D"]
+script = SubResource("GDScript_awwuy")
+
+[node name="SpeechBubble" type="Sprite2D" parent="."]
+position = Vector2(67, -13)
+scale = Vector2(0.035, 0.035)
+texture = ExtResource("1_d0bwt")
+
+[node name="Want" type="Sprite2D" parent="SpeechBubble"]
+unique_name_in_owner = true
+position = Vector2(28.5714, -114.286)
+texture = ExtResource("2_ff2k2")

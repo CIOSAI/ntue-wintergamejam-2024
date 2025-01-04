@@ -1,0 +1,65 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqgls8oun0njo"]
+
+[sub_resource type="GDScript" id="GDScript_hdmtc"]
+script/source = "extends HBoxContainer
+
+enum TYPE {DIRECT, LEFT, HALT}
+
+signal changed(type:TYPE)
+
+var show_signal:TYPE = TYPE.DIRECT :
+	set(to_type):
+		show_signal = to_type
+		match to_type:
+			TYPE.DIRECT: %Label.text = \"直行\"
+			TYPE.LEFT: %Label.text = \"左轉\"
+			TYPE.HALT: %Label.text = \"待轉\"
+
+func _ready():
+	%Label.text = \"直行\"
+
+func _on_left_pressed():
+	changed.emit(TYPE.LEFT)
+
+func _on_direct_pressed():
+	changed.emit(TYPE.DIRECT)
+
+func _on_halt_pressed():
+	changed.emit(TYPE.HALT)
+"
+
+[node name="JunctionInput" type="HBoxContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -20.0
+offset_right = 64.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+script = SubResource("GDScript_hdmtc")
+
+[node name="Left" type="Button" parent="."]
+layout_mode = 2
+text = "左轉"
+
+[node name="Direct" type="Button" parent="."]
+layout_mode = 2
+text = "直行"
+
+[node name="Halt" type="Button" parent="."]
+layout_mode = 2
+text = "待轉"
+
+[node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+
+[connection signal="pressed" from="Left" to="." method="_on_left_pressed"]
+[connection signal="pressed" from="Direct" to="." method="_on_direct_pressed"]
+[connection signal="pressed" from="Halt" to="." method="_on_halt_pressed"]

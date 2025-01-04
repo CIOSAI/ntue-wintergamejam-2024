@@ -1,0 +1,325 @@
+[gd_scene load_steps=10 format=3 uid="uid://dmq6s4iukps81"]
+
+[ext_resource type="Script" path="res://CIOSAI/road.gd" id="1_l7jmx"]
+[ext_resource type="PackedScene" uid="uid://c10f3x6so1eik" path="res://CIOSAI/sushi.tscn" id="2_0ja0r"]
+[ext_resource type="PackedScene" uid="uid://cqgls8oun0njo" path="res://CIOSAI/junction_input.tscn" id="3_f3gui"]
+[ext_resource type="PackedScene" uid="uid://bs8vbh1bgj1x2" path="res://CIOSAI/customer.tscn" id="3_hqsv2"]
+[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/Kirby_Nintendo.png" id="4_e8ygl"]
+[ext_resource type="Texture2D" uid="uid://bbqv75uyuc47o" path="res://CIOSAI/Mickey_Mouse.svg.png" id="5_vg8mr"]
+
+[sub_resource type="GDScript" id="GDScript_uuyii"]
+script/source = "extends Node2D
+
+enum TYPE {DIRECT, LEFT, HALT}
+
+signal crashed
+
+@export var sushi_res:PackedScene
+
+var control_for := []
+var speed := 100.0
+var score := 0 :
+	set(i):
+		score = i
+		%ShowScore.text = str(score)
+
+func _ready():
+	control_for.append({
+		\"control\": $Control/JunctionInput, \"road\": %Map.get_children()[2], 
+		\"signal\": TYPE.DIRECT, \"occupied\": false
+	})
+	control_for.append({
+		\"control\": $Control/JunctionInput2, \"road\": %Map.get_children()[5], 
+		\"signal\": TYPE.DIRECT, \"occupied\": false
+	})
+	
+	for i in control_for:
+		i[\"control\"].changed.connect(func (to_type): junction_changed(i[\"control\"], to_type))
+	
+	for customer in %Customers.get_children():
+		customer.food = randi()%2
+		customer.eaten.connect(func(correct): 
+			customer.food = randi()%2
+			score += 3 if correct else -5
+		)
+
+func update_sushies(delta):
+	for sushi in %Sushies.get_children():
+		var to_move = speed*delta
+		if sushi.halted: to_move = 0.0
+		var dist = sushi.on_road.points[0].distance_to(sushi.on_road.points[1])
+		
+		if sushi.perc*dist+to_move < dist:
+			sushi.perc += to_move/dist
+		else:
+			var signal_type = next_road_signal(sushi.on_road)
+			var entry
+			
+			if signal_type == TYPE.DIRECT: sushi.on_road = sushi.on_road.direct_road
+			elif  signal_type == TYPE.LEFT: sushi.on_road = sushi.on_road.left_road
+			else: 
+				entry = control_for.filter(func (i): return i[\"road\"] == sushi.on_road)[0]
+				if entry[\"occupied\"]: crashed.emit()
+				else:
+					sushi.on_road = sushi.on_road.left_road
+					sushi.halted = true
+					entry[\"occupied\"] = true
+			
+			var extra_move = sushi.perc*dist+to_move - dist
+			var next_dist = sushi.on_road.points[0].distance_to(sushi.on_road.points[1])
+			sushi.perc = extra_move/next_dist
+			
+			if signal_type == TYPE.HALT:
+				sushi.continued.connect(func (): entry[\"occupied\"] = false)
+
+func _process(delta):
+	update_sushies(delta)
+
+func next_road_signal(road:Line2D):
+	var to_check = control_for.filter(func (i): return i[\"road\"] == road)
+	if to_check.is_empty(): return TYPE.DIRECT
+	return to_check[0][\"control\"].show_signal
+
+func junction_changed(control, to_type):
+	var to_modify = control_for.filter(func (i): return i[\"control\"] == control)
+	control.show_signal = to_type
+
+func _on_crashed():
+	%Crashed.show()
+	get_tree().paused = true
+
+func _on_replay_pressed():
+	get_tree().paused = false
+	get_tree().reload_current_scene()
+
+func _on_timer_timeout():
+	var instance = sushi_res.instantiate()
+	instance.on_road = %Map.get_children()[0]
+	instance.food = randi()%2
+	%Sushies.add_child(instance)
+"
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_qcv1t"]
+a = Vector2(66, 127)
+b = Vector2(44, 127)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_uqqx4"]
+a = Vector2(-30, 0)
+b = Vector2(30, 0)
+
+[node name="CIOSAIsPrototype" type="Node2D"]
+script = SubResource("GDScript_uuyii")
+sushi_res = ExtResource("2_0ja0r")
+
+[node name="Map" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="Line2D9" type="Line2D" parent="Map"]
+points = PackedVector2Array(379, 350, 376, 210)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D")
+
+[node name="Line2D" type="Line2D" parent="Map"]
+points = PackedVector2Array(377, 205, 379, -197)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D2")
+
+[node name="Line2D2" type="Line2D" parent="Map"]
+points = PackedVector2Array(382, -194, 34, -191)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D7")
+left = NodePath("../Line2D6")
+
+[node name="Line2D7" type="Line2D" parent="Map"]
+points = PackedVector2Array(-3, -194, -356, -199)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D3")
+
+[node name="Line2D3" type="Line2D" parent="Map"]
+points = PackedVector2Array(-367, -201, -374, 189)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D4")
+
+[node name="Line2D4" type="Line2D" parent="Map"]
+points = PackedVector2Array(-383, 191, -20, 192)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D8")
+left = NodePath("../Line2D5")
+
+[node name="Line2D8" type="Line2D" parent="Map"]
+points = PackedVector2Array(13, 191, 369, 205)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D")
+
+[node name="Line2D5" type="Line2D" parent="Map"]
+points = PackedVector2Array(20, 176, 30, -178)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D7")
+
+[node name="Line2D6" type="Line2D" parent="Map"]
+points = PackedVector2Array(-4, -172, -20, 177)
+script = ExtResource("1_l7jmx")
+direct = NodePath("../Line2D8")
+
+[node name="Sushies" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="Customers" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="KirbyCustomer" parent="Customers" instance=ExtResource("3_hqsv2")]
+position = Vector2(511, 269)
+
+[node name="coll" type="Area2D" parent="Customers/KirbyCustomer"]
+position = Vector2(-7, -107)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Customers/KirbyCustomer/coll"]
+shape = SubResource("SegmentShape2D_qcv1t")
+
+[node name="sprite" type="Sprite2D" parent="Customers/KirbyCustomer"]
+position = Vector2(-11, -5)
+scale = Vector2(0.265, 0.265)
+texture = ExtResource("4_e8ygl")
+
+[node name="Customer" parent="Customers" instance=ExtResource("3_hqsv2")]
+position = Vector2(656, 331)
+
+[node name="coll" type="Area2D" parent="Customers/Customer"]
+position = Vector2(-55, 9)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Customers/Customer/coll"]
+position = Vector2(28, 25)
+shape = SubResource("SegmentShape2D_uqqx4")
+
+[node name="sprite" type="Sprite2D" parent="Customers/Customer"]
+position = Vector2(-4, 35)
+scale = Vector2(0.06, 0.06)
+texture = ExtResource("5_vg8mr")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 6.0
+autostart = true
+
+[node name="Control" type="Control" parent="."]
+custom_minimum_size = Vector2(1152, 648)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="JunctionInput" parent="Control" instance=ExtResource("3_f3gui")]
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 530.0
+offset_top = 14.0
+offset_right = 658.0
+offset_bottom = 54.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="JunctionInput2" parent="Control" instance=ExtResource("3_f3gui")]
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 521.0
+offset_top = 592.0
+offset_right = 649.0
+offset_bottom = 632.0
+grow_horizontal = 1
+grow_vertical = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 57.0
+offset_top = 42.0
+offset_right = 108.0
+offset_bottom = 82.0
+
+[node name="Label" type="Label" parent="Control/HBoxContainer"]
+layout_mode = 2
+text = "分數:"
+
+[node name="ShowScore" type="Label" parent="Control/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="Control" type="Control" parent="CanvasLayer2"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="Crashed" type="Control" parent="CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/Crashed"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Crashed/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -29.0
+offset_right = 36.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="CanvasLayer/Crashed/Panel/VBoxContainer"]
+layout_mode = 2
+text = "撞車"
+horizontal_alignment = 1
+
+[node name="Replay" type="Button" parent="CanvasLayer/Crashed/Panel/VBoxContainer"]
+layout_mode = 2
+text = "再玩一次"
+
+[connection signal="crashed" from="." to="." method="_on_crashed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Crashed/Panel/VBoxContainer/Replay" to="." method="_on_replay_pressed"]
