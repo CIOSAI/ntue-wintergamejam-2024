@@ -1,10 +1,12 @@
-[gd_scene load_steps=13 format=3 uid="uid://cwgjp3ksx4v13"]
+[gd_scene load_steps=24 format=3 uid="uid://cwgjp3ksx4v13"]
 
 [ext_resource type="PackedScene" uid="uid://i8vo14dhbo80" path="res://CIOSAI/one_sushi_bomb/push_area.tscn" id="1_uw7ma"]
 [ext_resource type="PackedScene" uid="uid://c254loyfr7c7p" path="res://CIOSAI/one_sushi_bomb/food.tscn" id="2_67e18"]
-[ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/fri/arrow-fat-right-fill.svg" id="2_s70u3"]
+[ext_resource type="Texture2D" uid="uid://dh56cagu3wjrg" path="res://CIOSAI/one_sushi_bomb/background.png" id="2_ikmkr"]
+[ext_resource type="Texture2D" uid="uid://d1ie8jcy1q7ad" path="res://CIOSAI/one_sushi_bomb/conveyer_tile.png" id="4_760ei"]
 [ext_resource type="PackedScene" uid="uid://c1sypyvr3d0nv" path="res://CIOSAI/one_sushi_bomb/bin.tscn" id="4_j3qml"]
-[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="5_my72a"]
+[ext_resource type="Texture2D" uid="uid://cdxroramb5bo8" path="res://CIOSAI/one_sushi_bomb/turner.png" id="4_lfjtf"]
+[ext_resource type="PackedScene" uid="uid://dvqv7jtx4snj0" path="res://CIOSAI/one_sushi_bomb/customer.tscn" id="5_x8s7x"]
 
 [sub_resource type="GDScript" id="GDScript_qgsqv"]
 script/source = "extends Node2D
@@ -18,7 +20,7 @@ var is_left := false :
 			i.direction = Vector2.LEFT if is_left else Vector2.RIGHT
 		for i in %Distribs.get_children():
 			i.direction = Vector2.LEFT if is_left else Vector2.RIGHT
-			i.get_node(\"Sprite2D\").rotation = i.direction.angle()
+			i.get_node(\"Sprite2D\").rotation = i.direction.angle()+PI/2
 var is_up := false :
 	set(b):
 		is_up = b
@@ -26,7 +28,7 @@ var is_up := false :
 			i.direction = Vector2.UP if is_up else Vector2.DOWN
 		for i in %Distribs.get_children():
 			i.direction = Vector2.UP if is_up else Vector2.DOWN
-			i.get_node(\"Sprite2D\").rotation = i.direction.angle()
+			i.get_node(\"Sprite2D\").rotation = i.direction.angle()+PI/2
 var score := 0 :
 	set(i):
 		score = i
@@ -34,8 +36,13 @@ var score := 0 :
 
 func _ready():
 	%Timer.start()
-	for i in %Customers.get_children():
-		i.body_entered.connect(_on_customer_body_entered)
+	reset_customer()
+	await get_tree().create_tween().tween_interval(1).finished
+	spawn_sushi()
+
+func animate_conveyers():
+	%ConveyersLRAnim.speed_scale = (-1 if is_left else 1)*1
+	%ConveyersTDAnim.speed_scale = (-1 if is_up else 1)*1
 
 func _process(delta):
 	if Input.is_action_just_pressed(\"ui_right\"):
@@ -46,14 +53,30 @@ func _process(delta):
 		is_up = false
 	if Input.is_action_just_pressed(\"ui_up\"):
 		is_up = true
+	
+	animate_conveyers()
+
+func get_food_spawn():
+	return %Entrances.get_children().pick_random().global_position
+
+func reset_customer():
+	%Customer.position = Vector2(round(randf())*2-1, round(randf())*2-1)*100
+	%Customer.facing = randi()%4
+
+func spawn_sushi():
+	var instance = food_res.instantiate()
+	instance.is_sushi = true
+	instance.global_position = get_food_spawn()
+	add_child(instance)
+	instance.tree_exited.connect(spawn_sushi)
 
 func _on_timer_timeout():
 	var instance = food_res.instantiate()
-	instance.is_sushi = randi()%2 == 0
-	instance.global_position = %FoodSpawn.global_position
+	instance.is_sushi = false
+	instance.global_position = get_food_spawn()
 	add_child(instance)
 
-func _on_customer_body_entered(body):
+func _on_customer_eaten(body):
 	score += 1 if body.is_sushi else -1
 	body.queue_free()
 "
@@ -64,22 +87,216 @@ size = Vector2(190, 10)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b5nto"]
 size = Vector2(10, 190)
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_l0wph"]
-a = Vector2(100, 0)
-b = Vector2(0, 0)
+[sub_resource type="Animation" id="Animation_u6ylg"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Left:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Right:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1130, -3)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Down:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Up:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(4, 664)]
+}
 
-[sub_resource type="SegmentShape2D" id="SegmentShape2D_nrcmw"]
-b = Vector2(-100, 0)
+[sub_resource type="Animation" id="Animation_eatnf"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Left:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(23, 0), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Right:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1130, -3), Vector2(1153, -3)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Down:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 23)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Up:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(4, 664), Vector2(4, 641)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0s7a6"]
+_data = {
+"RESET": SubResource("Animation_u6ylg"),
+"default": SubResource("Animation_eatnf")
+}
+
+[sub_resource type="Animation" id="Animation_1nm41"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ConveyersLR:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_6l7ru"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ConveyersLR:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(45, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ph0gb"]
+_data = {
+"RESET": SubResource("Animation_1nm41"),
+"default": SubResource("Animation_6l7ru")
+}
+
+[sub_resource type="Animation" id="Animation_8hogj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_3gika"]
+resource_name = "default"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 45)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ue0qn"]
+_data = {
+"RESET": SubResource("Animation_8hogj"),
+"default": SubResource("Animation_3gika")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ux1c"]
+size = Vector2(180, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f8nwc"]
+size = Vector2(10, 190)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jycyb"]
+size = Vector2(10, 180)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fr8h6"]
 radius = 5.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2ath"]
-size = Vector2(20, 160)
-
 [node name="Main" type="Node2D"]
 script = SubResource("GDScript_qgsqv")
 food_res = ExtResource("2_67e18")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ikmkr")
+expand_mode = 2
 
 [node name="LeftRight" type="Node2D" parent="."]
 unique_name_in_owner = true
@@ -185,21 +402,274 @@ speed = 100.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea6"]
 shape = SubResource("RectangleShape2D_b5nto")
 
-[node name="Entrance" parent="." instance=ExtResource("1_uw7ma")]
-position = Vector2(781, 424)
+[node name="ConveyersLR" type="Node2D" parent="."]
+
+[node name="Line2D" type="Line2D" parent="ConveyersLR"]
+texture_repeat = 2
+points = PackedVector2Array(374, 126, 774, 124)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersLR"]
+texture_repeat = 2
+points = PackedVector2Array(374, 322, 780, 323)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersLR"]
+texture_repeat = 2
+points = PackedVector2Array(375, 524, 775, 525)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="ConveyersTD" type="Node2D" parent="."]
+
+[node name="Line2D" type="Line2D" parent="ConveyersTD"]
+texture_repeat = 2
+points = PackedVector2Array(374, 126, 376, 521)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersTD"]
+texture_repeat = 2
+points = PackedVector2Array(573, 120, 576, 522)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersTD"]
+texture_repeat = 2
+points = PackedVector2Array(776, 131, 775, 525)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="ConveyersEntranceExit" type="Node2D" parent="."]
+
+[node name="Left" type="Node2D" parent="ConveyersEntranceExit"]
+
+[node name="Line2D" type="Line2D" parent="ConveyersEntranceExit/Left"]
+texture_repeat = 2
+points = PackedVector2Array(184, 122, 373, 123)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersEntranceExit/Left"]
+texture_repeat = 2
+points = PackedVector2Array(183, 526, 372, 526)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Left"]
+texture_repeat = 2
+points = PackedVector2Array(774, 325, 959, 325)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Right" type="Node2D" parent="ConveyersEntranceExit"]
+position = Vector2(1130, -3)
+scale = Vector2(-1, 1)
+
+[node name="Line2D" type="Line2D" parent="ConveyersEntranceExit/Right"]
+texture_repeat = 2
+points = PackedVector2Array(184, 122, 373, 123)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersEntranceExit/Right"]
+texture_repeat = 2
+points = PackedVector2Array(183, 526, 372, 526)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Right"]
+texture_repeat = 2
+points = PackedVector2Array(774, 325, 959, 325)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Down" type="Node2D" parent="ConveyersEntranceExit"]
+
+[node name="Line2D" type="Line2D" parent="ConveyersEntranceExit/Down"]
+texture_repeat = 2
+points = PackedVector2Array(376, 522, 375, 712)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersEntranceExit/Down"]
+texture_repeat = 2
+points = PackedVector2Array(572, -64, 574, 126)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Down"]
+texture_repeat = 2
+points = PackedVector2Array(773, 525, 776, 719)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Up" type="Node2D" parent="ConveyersEntranceExit"]
+position = Vector2(4, 664)
+scale = Vector2(1, -1)
+
+[node name="Line2D" type="Line2D" parent="ConveyersEntranceExit/Up"]
+texture_repeat = 2
+points = PackedVector2Array(376, 522, 375, 712)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D2" type="Line2D" parent="ConveyersEntranceExit/Up"]
+texture_repeat = 2
+points = PackedVector2Array(572, -64, 574, 126)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Up"]
+texture_repeat = 2
+points = PackedVector2Array(773, 525, 776, 719)
+width = 30.0
+texture = ExtResource("4_760ei")
+texture_mode = 1
+
+[node name="ConveyersEntranceExitAnim" type="AnimationPlayer" parent="."]
+root_node = NodePath("../ConveyersEntranceExit")
+libraries = {
+"": SubResource("AnimationLibrary_0s7a6")
+}
+autoplay = "default"
+
+[node name="ConveyersLRAnim" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_ph0gb")
+}
+autoplay = "default"
+
+[node name="ConveyersTDAnim" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+root_node = NodePath("../ConveyersTD")
+libraries = {
+"": SubResource("AnimationLibrary_ue0qn")
+}
+autoplay = "default"
+
+[node name="Entrances" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="Entrance" parent="Entrances" instance=ExtResource("1_uw7ma")]
+position = Vector2(300, 0)
 direction = Vector2(-1, 0)
 speed = 50.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrance"]
-shape = SubResource("SegmentShape2D_l0wph")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance"]
+shape = SubResource("RectangleShape2D_1ux1c")
 
-[node name="Exit" parent="." instance=ExtResource("1_uw7ma")]
-position = Vector2(376, 124)
+[node name="Entrance2" parent="Entrances" instance=ExtResource("1_uw7ma")]
+position = Vector2(-300, 0)
+direction = Vector2(1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance2"]
+shape = SubResource("RectangleShape2D_1ux1c")
+
+[node name="Entrance3" parent="Entrances" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, 300)
+direction = Vector2(0, -1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance3"]
+shape = SubResource("RectangleShape2D_f8nwc")
+
+[node name="Entrance4" parent="Entrances" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, -300)
+direction = Vector2(0, 1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance4"]
+shape = SubResource("RectangleShape2D_f8nwc")
+
+[node name="Exits" type="Node2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="Exit" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(-300, -200)
 direction = Vector2(-1, 0)
 speed = 50.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Exit"]
-shape = SubResource("SegmentShape2D_nrcmw")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit"]
+shape = SubResource("RectangleShape2D_1ux1c")
+
+[node name="Exit2" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(-300, 200)
+direction = Vector2(-1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit2"]
+shape = SubResource("RectangleShape2D_1ux1c")
+
+[node name="Exit3" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(300, 200)
+direction = Vector2(1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit3"]
+shape = SubResource("RectangleShape2D_1ux1c")
+
+[node name="Exit4" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(300, -200)
+direction = Vector2(1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit4"]
+shape = SubResource("RectangleShape2D_1ux1c")
+
+[node name="Exit5" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, -300)
+direction = Vector2(0, -1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit5"]
+shape = SubResource("RectangleShape2D_jycyb")
+
+[node name="Exit6" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, -300)
+direction = Vector2(0, -1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit6"]
+shape = SubResource("RectangleShape2D_jycyb")
+
+[node name="Exit7" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, 300)
+direction = Vector2(0, 1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit7"]
+shape = SubResource("RectangleShape2D_jycyb")
+
+[node name="Exit8" parent="Exits" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, 300)
+direction = Vector2(0, 1)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exits/Exit8"]
+shape = SubResource("RectangleShape2D_jycyb")
 
 [node name="Distribs" type="Node2D" parent="."]
 unique_name_in_owner = true
@@ -214,7 +684,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea2" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(0, -200)
@@ -225,7 +696,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea2"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea3" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(200, -200)
@@ -236,7 +708,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea3"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea4" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(-200, 0)
@@ -247,7 +720,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea4"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea5" parent="Distribs" instance=ExtResource("1_uw7ma")]
 direction = Vector2(1, 0)
@@ -257,7 +731,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea5"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea6" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(200, 0)
@@ -268,7 +743,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea6"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea7" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(-200, 200)
@@ -279,7 +755,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea7"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea8" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(0, 200)
@@ -290,7 +767,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea8"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
 [node name="PushArea9" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(200, 200)
@@ -301,42 +779,48 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea9"]
-texture = ExtResource("2_s70u3")
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_lfjtf")
 
-[node name="Bin" parent="." instance=ExtResource("4_j3qml")]
-position = Vector2(274, 124)
+[node name="Bins" type="Node2D" parent="."]
 
-[node name="FoodSpawn" type="Marker2D" parent="."]
-unique_name_in_owner = true
-position = Vector2(869, 424)
+[node name="Bin" parent="Bins" instance=ExtResource("4_j3qml")]
+position = Vector2(179, 122)
+
+[node name="Bin2" parent="Bins" instance=ExtResource("4_j3qml")]
+position = Vector2(181, 523)
+
+[node name="Bin3" parent="Bins" instance=ExtResource("4_j3qml")]
+position = Vector2(963, 522)
+
+[node name="Bin4" parent="Bins" instance=ExtResource("4_j3qml")]
+position = Vector2(959, 125)
 
 [node name="Timer" type="Timer" parent="."]
 unique_name_in_owner = true
 wait_time = 4.0
 
-[node name="Customers" type="Node2D" parent="."]
+[node name="CustomerLayer" type="Node2D" parent="."]
+position = Vector2(576, 324)
+
+[node name="Customer" parent="CustomerLayer" instance=ExtResource("5_x8s7x")]
 unique_name_in_owner = true
+position = Vector2(100, 100)
 
-[node name="Customer" type="Area2D" parent="Customers"]
-position = Vector2(376, 424)
-collision_layer = 0
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_left = 48.0
+offset_top = 40.0
+offset_right = 99.0
+offset_bottom = 80.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Customers/Customer"]
-shape = SubResource("RectangleShape2D_c2ath")
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "分數:"
 
-[node name="CustomerSprites" type="Node2D" parent="."]
-
-[node name="CustomerSprite" type="Sprite2D" parent="CustomerSprites"]
-position = Vector2(425, 419)
-scale = Vector2(0.175, 0.175)
-texture = ExtResource("5_my72a")
-
-[node name="ScoreLabel" type="Label" parent="."]
+[node name="ScoreLabel" type="Label" parent="HBoxContainer"]
 unique_name_in_owner = true
-offset_left = 294.0
-offset_top = 402.0
-offset_right = 334.0
-offset_bottom = 425.0
+layout_mode = 2
 text = "0"
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="eaten" from="CustomerLayer/Customer" to="." method="_on_customer_eaten"]

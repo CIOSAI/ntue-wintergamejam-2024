@@ -19,7 +19,7 @@ script = SubResource("GDScript_7hki6")
 shape = SubResource("CircleShape2D_3ky43")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.13, 0.13)
+scale = Vector2(0.235, 0.235)
 texture = ExtResource("1_h88ck")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

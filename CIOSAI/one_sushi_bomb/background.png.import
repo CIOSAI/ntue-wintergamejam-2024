@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dnnoy7x67grut"
-path="res://.godot/imported/鮭魚.png-2b657ef20c3487b406fa9a238ac12e98.ctex"
+uid="uid://dh56cagu3wjrg"
+path="res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/one_sushi_bomb/鮭魚.png"
-dest_files=["res://.godot/imported/鮭魚.png-2b657ef20c3487b406fa9a238ac12e98.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/background.png"
+dest_files=["res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"]
 
 [params]
 

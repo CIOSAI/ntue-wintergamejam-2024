@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://c254loyfr7c7p"]
 
-[ext_resource type="Texture2D" uid="uid://dnnoy7x67grut" path="res://CIOSAI/one_sushi_bomb/鮭魚.png" id="1_uggll"]
+[ext_resource type="Texture2D" uid="uid://dnnoy7x67grut" path="res://CIOSAI/one_sushi_bomb/sushi_salmon.png" id="1_uggll"]
 [ext_resource type="Texture2D" uid="uid://bngs71y41chs8" path="res://CIOSAI/one_sushi_bomb/bomb-fill.svg" id="2_ld2s8"]
 
 [sub_resource type="GDScript" id="GDScript_v75jx"]

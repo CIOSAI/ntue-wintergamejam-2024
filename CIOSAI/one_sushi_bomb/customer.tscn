@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=3 uid="uid://dvqv7jtx4snj0"]
+
+[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="1_qvbih"]
+
+[sub_resource type="GDScript" id="GDScript_n1yjr"]
+script/source = "extends Node2D
+
+signal eaten(body)
+
+var facing:int = 0 :
+	set(i):
+		facing = i
+		rotation = facing * PI/2
+		%CustomerSprite.rotation -= rotation
+
+
+func _on_customer_collision_body_entered(body):
+	eaten.emit(body)
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2ath"]
+size = Vector2(20, 160)
+
+[node name="Customer" type="Node2D"]
+script = SubResource("GDScript_n1yjr")
+
+[node name="CustomerCollision" type="Area2D" parent="."]
+position = Vector2(100, 0)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CustomerCollision"]
+shape = SubResource("RectangleShape2D_c2ath")
+
+[node name="CustomerPivot" type="Node2D" parent="."]
+position = Vector2(48, 0)
+
+[node name="CustomerSprite" type="Sprite2D" parent="CustomerPivot"]
+unique_name_in_owner = true
+scale = Vector2(0.175, 0.175)
+texture = ExtResource("1_qvbih")
+
+[connection signal="body_entered" from="CustomerCollision" to="." method="_on_customer_collision_body_entered"]
