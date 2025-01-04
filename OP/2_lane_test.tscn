@@ -1,0 +1,317 @@
+[gd_scene load_steps=15 format=3 uid="uid://c5g84oci015l3"]
+
+[ext_resource type="Texture2D" uid="uid://hbgmng47la85" path="res://icon.svg" id="1_xf2ae"]
+
+[sub_resource type="GDScript" id="GDScript_3wtml"]
+script/source = "extends Node2D
+
+@onready var moto: Area2D = $Moto
+@onready var car: Area2D = $Car
+@onready var moto_dir_label: Label = $Moto/Dir/Dir
+@onready var moto_order_label: Label = $Moto/Order/Order
+@onready var car_dir_label: Label = $Car/Dir/Dir
+@onready var car_order_label: Label = $Car/Order/Order
+@onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var animation_player_2: AnimationPlayer = $AnimationPlayer2
+
+func _ready() -> void:
+	for area: Area2D in [$Moto/Dir, $Moto/Order, $Car/Dir, $Car/Order]:
+		area.input_event.connect(_on_area_input_event.bind(area))
+
+func _on_area_input_event(viewport: Node, event: InputEvent, shape_idx: int, from_area: Area2D):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			if from_area == $Moto/Dir:
+				if moto_dir_label.text == \"←\":
+					moto_dir_label.text = \"↑\"
+				elif moto_dir_label.text == \"↑\":
+					moto_dir_label.text = \"←\"
+			if from_area == $Moto/Order:
+				if moto_order_label.text == \"1\":
+					car_order_label.text = \"1\"
+					moto_order_label.text = \"2\"
+				elif moto_order_label.text == \"2\":
+					car_order_label.text = \"2\"
+					moto_order_label.text = \"1\"
+			if from_area == $Car/Dir:
+				if car_dir_label.text == \"←\":
+					car_dir_label.text = \"↑\"
+				elif car_dir_label.text == \"↑\":
+					car_dir_label.text = \"←\"
+			if from_area == $Car/Order:
+				if car_order_label.text == \"1\":
+					car_order_label.text = \"2\"
+					moto_order_label.text = \"1\"
+				elif car_order_label.text == \"2\":
+					car_order_label.text = \"1\"
+					moto_order_label.text = \"2\"
+
+func _on_button_pressed() -> void:
+	if moto_order_label.text == \"1\":
+		if moto_dir_label.text == \"↑\":
+			animation_player.play(\"moto_go_straight\")
+		else:
+			animation_player.play(\"moto_go_left\")
+	else:
+		if car_dir_label.text == \"↑\":
+			animation_player.play(\"car_go_straight\")
+		else:
+			animation_player.play(\"car_go_left\")
+	
+	await get_tree().create_timer(1).timeout
+	
+	if moto_order_label.text == \"2\":
+		if moto_dir_label.text == \"↑\":
+			animation_player_2.play(\"moto_go_straight\")
+		else:
+			animation_player_2.play(\"moto_go_left\")
+	else:
+		if car_dir_label.text == \"↑\":
+			animation_player_2.play(\"car_go_straight\")
+		else:
+			animation_player_2.play(\"car_go_left\")
+"
+
+[sub_resource type="Gradient" id="Gradient_ds31k"]
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ephx8"]
+gradient = SubResource("Gradient_ds31k")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nrvcg"]
+size = Vector2(56, 52)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8vswx"]
+size = Vector2(20, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kqcpb"]
+
+[sub_resource type="Animation" id="Animation_qrghm"]
+resource_name = "moto_go_left"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Moto:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2, 4),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(623, 629), Vector2(629, 299), Vector2(629, 299), Vector2(-51, 308)]
+}
+
+[sub_resource type="Animation" id="Animation_nirxe"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Moto:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(623, 629)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Car:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(535, 622)]
+}
+
+[sub_resource type="Animation" id="Animation_xt0sv"]
+resource_name = "moto_go_straight"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Moto:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(623, 629), Vector2(623, -45)]
+}
+
+[sub_resource type="Animation" id="Animation_qkiv2"]
+resource_name = "car_go_left"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Car:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(535, 658), Vector2(539, 376), Vector2(-49, 382)]
+}
+
+[sub_resource type="Animation" id="Animation_po7db"]
+resource_name = "car_go_straight"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Car:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(622, 650), Vector2(619, -50)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0k5tp"]
+_data = {
+"RESET": SubResource("Animation_nirxe"),
+"car_go_left": SubResource("Animation_qkiv2"),
+"car_go_straight": SubResource("Animation_po7db"),
+"moto_go_left": SubResource("Animation_qrghm"),
+"moto_go_straight": SubResource("Animation_xt0sv")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_43phi"]
+_data = {
+"RESET": SubResource("Animation_nirxe"),
+"car_go_left": SubResource("Animation_qkiv2"),
+"car_go_straight": SubResource("Animation_po7db"),
+"moto_go_left": SubResource("Animation_qrghm"),
+"moto_go_straight": SubResource("Animation_xt0sv")
+}
+
+[node name="2LaneTest" type="Node2D"]
+script = SubResource("GDScript_3wtml")
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D"]
+position = Vector2(253, 135.25)
+scale = Vector2(1.89844, 271.5)
+texture = SubResource("GradientTexture1D_ephx8")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Node2D"]
+position = Vector2(251, 523.875)
+scale = Vector2(1.89844, 235.75)
+texture = SubResource("GradientTexture1D_ephx8")
+
+[node name="Sprite2D3" type="Sprite2D" parent="Node2D"]
+position = Vector2(903, 328.562)
+scale = Vector2(1.89844, 646.875)
+texture = SubResource("GradientTexture1D_ephx8")
+
+[node name="Sprite2D4" type="Sprite2D" parent="Node2D"]
+position = Vector2(580, 323)
+scale = Vector2(0.0273441, 646.875)
+texture = SubResource("GradientTexture1D_ephx8")
+
+[node name="Sprite2D5" type="Sprite2D" parent="Node2D"]
+position = Vector2(252, 342)
+scale = Vector2(1.86719, 11)
+texture = SubResource("GradientTexture1D_ephx8")
+
+[node name="Moto" type="Area2D" parent="."]
+modulate = Color(0.74902, 0.827451, 0, 1)
+position = Vector2(623, 629)
+
+[node name="Icon" type="Sprite2D" parent="Moto"]
+scale = Vector2(0.445, 0.445)
+texture = ExtResource("1_xf2ae")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Moto"]
+shape = SubResource("RectangleShape2D_nrvcg")
+
+[node name="Dir" type="Area2D" parent="Moto"]
+position = Vector2(0, -38)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Moto/Dir"]
+shape = SubResource("RectangleShape2D_8vswx")
+
+[node name="Dir" type="Label" parent="Moto/Dir"]
+offset_left = -7.0
+offset_top = -11.0
+offset_right = 33.0
+offset_bottom = 12.0
+text = "↑"
+
+[node name="Order" type="Area2D" parent="Moto"]
+position = Vector2(0, -54)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Moto/Order"]
+shape = SubResource("RectangleShape2D_kqcpb")
+
+[node name="Order" type="Label" parent="Moto/Order"]
+offset_left = -5.0
+offset_top = -12.0
+offset_right = 35.0
+offset_bottom = 11.0
+text = "1"
+
+[node name="Car" type="Area2D" parent="."]
+modulate = Color(0.619608, 0.101961, 0.682353, 1)
+position = Vector2(535, 622)
+
+[node name="Icon" type="Sprite2D" parent="Car"]
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("1_xf2ae")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Car"]
+shape = SubResource("RectangleShape2D_nrvcg")
+
+[node name="Dir" type="Area2D" parent="Car"]
+position = Vector2(0, -38)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Car/Dir"]
+shape = SubResource("RectangleShape2D_8vswx")
+
+[node name="Dir" type="Label" parent="Car/Dir"]
+offset_left = -7.0
+offset_top = -11.0
+offset_right = 33.0
+offset_bottom = 12.0
+text = "←"
+
+[node name="Order" type="Area2D" parent="Car"]
+position = Vector2(0, -54)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Car/Order"]
+shape = SubResource("RectangleShape2D_kqcpb")
+
+[node name="Order" type="Label" parent="Car/Order"]
+offset_left = -5.0
+offset_top = -12.0
+offset_right = 35.0
+offset_bottom = 11.0
+text = "2"
+
+[node name="Button" type="Button" parent="."]
+offset_left = 756.0
+offset_top = 498.0
+offset_right = 843.49
+offset_bottom = 529.0
+text = "myGO!!!!!"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_0k5tp")
+}
+
+[node name="AnimationPlayer2" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_43phi")
+}
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
