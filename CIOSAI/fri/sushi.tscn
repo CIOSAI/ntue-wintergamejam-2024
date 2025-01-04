@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://c10f3x6so1eik"]
 
-[ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/arrow-fat-right-fill.svg" id="1_t15jc"]
-[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/circle.svg" id="2_vn6xo"]
+[ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/fri/arrow-fat-right-fill.svg" id="1_t15jc"]
+[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/fri/circle.svg" id="2_vn6xo"]
 
 [sub_resource type="GDScript" id="GDScript_538en"]
 script/source = "extends Sprite2D

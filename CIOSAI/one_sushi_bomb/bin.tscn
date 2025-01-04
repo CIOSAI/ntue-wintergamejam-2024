@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1sypyvr3d0nv"]
+
+[ext_resource type="Texture2D" uid="uid://dsmvcy60k0vgl" path="res://CIOSAI/fri/0_u0uiddywy77KM8X6.png" id="1_h88ck"]
+
+[sub_resource type="GDScript" id="GDScript_7hki6"]
+script/source = "extends Area2D
+
+func _on_body_entered(body):
+	body.queue_free()
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3ky43"]
+
+[node name="Bin" type="Area2D"]
+collision_layer = 0
+script = SubResource("GDScript_7hki6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_3ky43")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.13, 0.13)
+texture = ExtResource("1_h88ck")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

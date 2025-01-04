@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://i8vo14dhbo80"]
+
+[sub_resource type="GDScript" id="GDScript_0fyib"]
+script/source = "extends Area2D
+
+@export var direction:Vector2 = Vector2.ZERO
+@export var speed:float = 0.0
+"
+
+[node name="PushArea" type="Area2D"]
+collision_layer = 2
+collision_mask = 0
+script = SubResource("GDScript_0fyib")

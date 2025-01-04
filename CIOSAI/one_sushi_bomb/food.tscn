@@ -1,0 +1,71 @@
+[gd_scene load_steps=7 format=3 uid="uid://c254loyfr7c7p"]
+
+[ext_resource type="Texture2D" uid="uid://dnnoy7x67grut" path="res://CIOSAI/one_sushi_bomb/鮭魚.png" id="1_uggll"]
+[ext_resource type="Texture2D" uid="uid://bngs71y41chs8" path="res://CIOSAI/one_sushi_bomb/bomb-fill.svg" id="2_ld2s8"]
+
+[sub_resource type="GDScript" id="GDScript_v75jx"]
+script/source = "extends CharacterBody2D
+
+var is_sushi := false :
+	set(b):
+		is_sushi = b
+		%Sushi.visible = b
+		%Bomb.visible = not b
+var pushed_by = []
+
+func _on_pushed_by_exit_area_exited(area):
+	pushed_by = pushed_by.filter(func(e): return e[\"ref\"]!=area)
+
+func _on_pushed_by_enter_area_entered(area):
+	pushed_by.push_front({\"ref\": area, \"vel\": area.direction*area.speed})
+
+func _physics_process(delta):
+	if pushed_by.is_empty():
+		velocity = Vector2.ZERO
+	else:
+		velocity = pushed_by[0][\"vel\"]
+	move_and_slide()
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vsfqh"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_f3t48"]
+radius = 1.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gfdg0"]
+radius = 18.1108
+
+[node name="Food" type="CharacterBody2D"]
+collision_mask = 0
+script = SubResource("GDScript_v75jx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_vsfqh")
+
+[node name="PushedByEnter" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushedByEnter"]
+shape = SubResource("CircleShape2D_f3t48")
+
+[node name="PushedByExit" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushedByExit"]
+shape = SubResource("CircleShape2D_gfdg0")
+
+[node name="Sushi" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+visible = false
+scale = Vector2(0.07, 0.07)
+texture = ExtResource("1_uggll")
+
+[node name="Bomb" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+visible = false
+texture = ExtResource("2_ld2s8")
+
+[connection signal="area_entered" from="PushedByEnter" to="." method="_on_pushed_by_enter_area_entered"]
+[connection signal="area_exited" from="PushedByExit" to="." method="_on_pushed_by_exit_area_exited"]

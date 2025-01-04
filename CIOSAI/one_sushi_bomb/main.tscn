@@ -1,0 +1,342 @@
+[gd_scene load_steps=13 format=3 uid="uid://cwgjp3ksx4v13"]
+
+[ext_resource type="PackedScene" uid="uid://i8vo14dhbo80" path="res://CIOSAI/one_sushi_bomb/push_area.tscn" id="1_uw7ma"]
+[ext_resource type="PackedScene" uid="uid://c254loyfr7c7p" path="res://CIOSAI/one_sushi_bomb/food.tscn" id="2_67e18"]
+[ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/fri/arrow-fat-right-fill.svg" id="2_s70u3"]
+[ext_resource type="PackedScene" uid="uid://c1sypyvr3d0nv" path="res://CIOSAI/one_sushi_bomb/bin.tscn" id="4_j3qml"]
+[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="5_my72a"]
+
+[sub_resource type="GDScript" id="GDScript_qgsqv"]
+script/source = "extends Node2D
+
+@export var food_res:PackedScene
+
+var is_left := false :
+	set(b):
+		is_left = b
+		for i in %LeftRight.get_children():
+			i.direction = Vector2.LEFT if is_left else Vector2.RIGHT
+		for i in %Distribs.get_children():
+			i.direction = Vector2.LEFT if is_left else Vector2.RIGHT
+			i.get_node(\"Sprite2D\").rotation = i.direction.angle()
+var is_up := false :
+	set(b):
+		is_up = b
+		for i in %UpDown.get_children():
+			i.direction = Vector2.UP if is_up else Vector2.DOWN
+		for i in %Distribs.get_children():
+			i.direction = Vector2.UP if is_up else Vector2.DOWN
+			i.get_node(\"Sprite2D\").rotation = i.direction.angle()
+var score := 0 :
+	set(i):
+		score = i
+		%ScoreLabel.text = str(score)
+
+func _ready():
+	%Timer.start()
+	for i in %Customers.get_children():
+		i.body_entered.connect(_on_customer_body_entered)
+
+func _process(delta):
+	if Input.is_action_just_pressed(\"ui_right\"):
+		is_left = false
+	if Input.is_action_just_pressed(\"ui_left\"):
+		is_left = true
+	if Input.is_action_just_pressed(\"ui_down\"):
+		is_up = false
+	if Input.is_action_just_pressed(\"ui_up\"):
+		is_up = true
+
+func _on_timer_timeout():
+	var instance = food_res.instantiate()
+	instance.is_sushi = randi()%2 == 0
+	instance.global_position = %FoodSpawn.global_position
+	add_child(instance)
+
+func _on_customer_body_entered(body):
+	score += 1 if body.is_sushi else -1
+	body.queue_free()
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_piu5n"]
+size = Vector2(190, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b5nto"]
+size = Vector2(10, 190)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_l0wph"]
+a = Vector2(100, 0)
+b = Vector2(0, 0)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_nrcmw"]
+b = Vector2(-100, 0)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fr8h6"]
+radius = 5.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c2ath"]
+size = Vector2(20, 160)
+
+[node name="Main" type="Node2D"]
+script = SubResource("GDScript_qgsqv")
+food_res = ExtResource("2_67e18")
+
+[node name="LeftRight" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="PushArea" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(-100, -200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="PushArea2" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(-100, 0)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea2"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="PushArea3" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(-100, 200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea3"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="PushArea4" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(100, -200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea4"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="PushArea5" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(100, 0)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea5"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="PushArea6" parent="LeftRight" instance=ExtResource("1_uw7ma")]
+position = Vector2(100, 200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftRight/PushArea6"]
+shape = SubResource("RectangleShape2D_piu5n")
+
+[node name="UpDown" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="PushArea" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, -100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="PushArea2" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, -100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea2"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="PushArea3" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, -100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea3"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="PushArea4" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, 100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea4"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="PushArea5" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, 100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea5"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="PushArea6" parent="UpDown" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, 100)
+direction = Vector2(0, 1)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="UpDown/PushArea6"]
+shape = SubResource("RectangleShape2D_b5nto")
+
+[node name="Entrance" parent="." instance=ExtResource("1_uw7ma")]
+position = Vector2(781, 424)
+direction = Vector2(-1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Entrance"]
+shape = SubResource("SegmentShape2D_l0wph")
+
+[node name="Exit" parent="." instance=ExtResource("1_uw7ma")]
+position = Vector2(376, 124)
+direction = Vector2(-1, 0)
+speed = 50.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exit"]
+shape = SubResource("SegmentShape2D_nrcmw")
+
+[node name="Distribs" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(576, 324)
+
+[node name="PushArea" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, -200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea2" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, -200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea2"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea2"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea3" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, -200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea3"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea3"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea4" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, 0)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea4"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea4"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea5" parent="Distribs" instance=ExtResource("1_uw7ma")]
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea5"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea5"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea6" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, 0)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea6"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea6"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea7" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(-200, 200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea7"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea7"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea8" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(0, 200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea8"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea8"]
+texture = ExtResource("2_s70u3")
+
+[node name="PushArea9" parent="Distribs" instance=ExtResource("1_uw7ma")]
+position = Vector2(200, 200)
+direction = Vector2(1, 0)
+speed = 100.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Distribs/PushArea9"]
+shape = SubResource("CircleShape2D_fr8h6")
+
+[node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea9"]
+texture = ExtResource("2_s70u3")
+
+[node name="Bin" parent="." instance=ExtResource("4_j3qml")]
+position = Vector2(274, 124)
+
+[node name="FoodSpawn" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(869, 424)
+
+[node name="Timer" type="Timer" parent="."]
+unique_name_in_owner = true
+wait_time = 4.0
+
+[node name="Customers" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="Customer" type="Area2D" parent="Customers"]
+position = Vector2(376, 424)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Customers/Customer"]
+shape = SubResource("RectangleShape2D_c2ath")
+
+[node name="CustomerSprites" type="Node2D" parent="."]
+
+[node name="CustomerSprite" type="Sprite2D" parent="CustomerSprites"]
+position = Vector2(425, 419)
+scale = Vector2(0.175, 0.175)
+texture = ExtResource("5_my72a")
+
+[node name="ScoreLabel" type="Label" parent="."]
+unique_name_in_owner = true
+offset_left = 294.0
+offset_top = 402.0
+offset_right = 334.0
+offset_bottom = 425.0
+text = "0"
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

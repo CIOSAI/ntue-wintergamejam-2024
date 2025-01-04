@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://uk8ksrtc0mkd"
-path="res://.godot/imported/circle.svg-aa44adeb84093793a46b6c5019c2cc0f.ctex"
+uid="uid://bngs71y41chs8"
+path="res://.godot/imported/bomb-fill.svg-226d8f32bd76aa4db32212d30850ccfd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/circle.svg"
-dest_files=["res://.godot/imported/circle.svg-aa44adeb84093793a46b6c5019c2cc0f.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/bomb-fill.svg"
+dest_files=["res://.godot/imported/bomb-fill.svg-226d8f32bd76aa4db32212d30850ccfd.ctex"]
 
 [params]
 

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bs8vbh1bgj1x2"]
 
-[ext_resource type="Texture2D" uid="uid://ct3vrpl5bhgpu" path="res://CIOSAI/Speech_bubble.svg.png" id="1_d0bwt"]
-[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/circle.svg" id="2_ff2k2"]
+[ext_resource type="Texture2D" uid="uid://ct3vrpl5bhgpu" path="res://CIOSAI/fri/Speech_bubble.svg.png" id="1_d0bwt"]
+[ext_resource type="Texture2D" uid="uid://uk8ksrtc0mkd" path="res://CIOSAI/fri/circle.svg" id="2_ff2k2"]
 
 [sub_resource type="GDScript" id="GDScript_awwuy"]
 script/source = "extends Node2D

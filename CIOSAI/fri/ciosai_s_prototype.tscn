@@ -1,11 +1,11 @@
 [gd_scene load_steps=10 format=3 uid="uid://dmq6s4iukps81"]
 
-[ext_resource type="Script" path="res://CIOSAI/road.gd" id="1_l7jmx"]
-[ext_resource type="PackedScene" uid="uid://c10f3x6so1eik" path="res://CIOSAI/sushi.tscn" id="2_0ja0r"]
-[ext_resource type="PackedScene" uid="uid://cqgls8oun0njo" path="res://CIOSAI/junction_input.tscn" id="3_f3gui"]
-[ext_resource type="PackedScene" uid="uid://bs8vbh1bgj1x2" path="res://CIOSAI/customer.tscn" id="3_hqsv2"]
-[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/Kirby_Nintendo.png" id="4_e8ygl"]
-[ext_resource type="Texture2D" uid="uid://bbqv75uyuc47o" path="res://CIOSAI/Mickey_Mouse.svg.png" id="5_vg8mr"]
+[ext_resource type="Script" path="res://CIOSAI/fri/road.gd" id="1_l7jmx"]
+[ext_resource type="PackedScene" uid="uid://c10f3x6so1eik" path="res://CIOSAI/fri/sushi.tscn" id="2_0ja0r"]
+[ext_resource type="PackedScene" uid="uid://cqgls8oun0njo" path="res://CIOSAI/fri/junction_input.tscn" id="3_f3gui"]
+[ext_resource type="PackedScene" uid="uid://bs8vbh1bgj1x2" path="res://CIOSAI/fri/customer.tscn" id="3_hqsv2"]
+[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="4_e8ygl"]
+[ext_resource type="Texture2D" uid="uid://bbqv75uyuc47o" path="res://CIOSAI/fri/Mickey_Mouse.svg.png" id="5_vg8mr"]
 
 [sub_resource type="GDScript" id="GDScript_uuyii"]
 script/source = "extends Node2D
