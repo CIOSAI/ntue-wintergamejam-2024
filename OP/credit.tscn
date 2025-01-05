@@ -1,0 +1,64 @@
+[gd_scene load_steps=5 format=3 uid="uid://c6ly4l7tbbp1t"]
+
+[ext_resource type="Script" path="res://OP/credit.gd" id="1_pwldi"]
+[ext_resource type="Texture2D" uid="uid://chm48wy1obnct" path="res://OP/background_light.png" id="2_vwalt"]
+[ext_resource type="Theme" uid="uid://ljp1l4vvr1ba" path="res://OP/title.tres" id="3_rjnss"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_v8y7g"]
+font_size = 30
+outline_size = 6
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Credit" type="Node2D"]
+script = ExtResource("1_pwldi")
+
+[node name="BackgroundLight" type="Sprite2D" parent="."]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_vwalt")
+centered = false
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("3_rjnss")
+
+[node name="Label" type="Label" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -41.5
+offset_top = -11.5
+offset_right = 41.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "123123123"
+label_settings = SubResource("LabelSettings_v8y7g")
+
+[node name="Back" type="Button" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = 188.0
+offset_right = 64.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "返回標題"
+
+[connection signal="pressed" from="CanvasLayer/Control/Back" to="." method="_on_back_pressed"]

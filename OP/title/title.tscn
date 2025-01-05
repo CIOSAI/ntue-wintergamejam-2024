@@ -1,3 +1,56 @@
-[gd_scene format=3 uid="uid://1820b2b2ynrp"]
+[gd_scene load_steps=7 format=3 uid="uid://1820b2b2ynrp"]
 
-[node name="Node2D" type="Node2D"]
+[ext_resource type="Texture2D" uid="uid://bxwdymjfd7l8s" path="res://OP/title/title.png" id="1_0nm0w"]
+[ext_resource type="Script" path="res://OP/title/title.gd" id="1_uyub2"]
+[ext_resource type="PackedScene" uid="uid://cwgjp3ksx4v13" path="res://CIOSAI/one_sushi_bomb/main.tscn" id="2_hyyl5"]
+[ext_resource type="PackedScene" uid="uid://c6ly4l7tbbp1t" path="res://OP/credit.tscn" id="3_ajyb5"]
+[ext_resource type="Texture2D" uid="uid://bc1c3qeiphcsj" path="res://OP/title/title_title.png" id="3_uf64o"]
+
+[sub_resource type="Theme" id="Theme_s0ua2"]
+default_font_size = 30
+
+[node name="Title" type="Node2D"]
+script = ExtResource("1_uyub2")
+game_scene = ExtResource("2_hyyl5")
+credit_scene = ExtResource("3_ajyb5")
+
+[node name="Title" type="Sprite2D" parent="."]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("1_0nm0w")
+centered = false
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_s0ua2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 0
+offset_left = 186.0
+offset_top = 201.0
+offset_right = 574.0
+offset_bottom = 359.0
+
+[node name="Start" type="Button" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "開始遊戲"
+
+[node name="Credit" type="Button" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "工作人員"
+
+[node name="Exit" type="Button" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "離開遊戲"
+
+[node name="TitleTitle" type="Sprite2D" parent="."]
+position = Vector2(239, 112)
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("3_uf64o")
