@@ -1,13 +1,15 @@
-[gd_scene load_steps=7 format=3 uid="uid://1820b2b2ynrp"]
+[gd_scene load_steps=8 format=3 uid="uid://1820b2b2ynrp"]
 
 [ext_resource type="Texture2D" uid="uid://bxwdymjfd7l8s" path="res://OP/title/title.png" id="1_0nm0w"]
 [ext_resource type="Script" path="res://OP/title/title.gd" id="1_uyub2"]
 [ext_resource type="PackedScene" uid="uid://cwgjp3ksx4v13" path="res://CIOSAI/one_sushi_bomb/main.tscn" id="2_hyyl5"]
 [ext_resource type="PackedScene" uid="uid://c6ly4l7tbbp1t" path="res://OP/credit.tscn" id="3_ajyb5"]
 [ext_resource type="Texture2D" uid="uid://bc1c3qeiphcsj" path="res://OP/title/title_title.png" id="3_uf64o"]
+[ext_resource type="FontFile" uid="uid://ccfcsjticljua" path="res://OP/Cubic_11.ttf" id="5_m6p8a"]
 
 [sub_resource type="Theme" id="Theme_s0ua2"]
-default_font_size = 30
+default_font = ExtResource("5_m6p8a")
+default_font_size = 36
 
 [node name="Title" type="Node2D"]
 script = ExtResource("1_uyub2")
@@ -30,10 +32,10 @@ theme = SubResource("Theme_s0ua2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
 layout_mode = 0
-offset_left = 186.0
-offset_top = 201.0
-offset_right = 574.0
-offset_bottom = 359.0
+offset_left = 297.0
+offset_top = 195.0
+offset_right = 522.0
+offset_bottom = 353.0
 
 [node name="Start" type="Button" parent="Control/VBoxContainer"]
 unique_name_in_owner = true
