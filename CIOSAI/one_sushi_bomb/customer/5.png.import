@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccrfjbffjr8o5"
-path="res://.godot/imported/turner.png-04625508fd8192b863b7a3ce5a67f3cd.ctex"
+uid="uid://dhxvpvm07xgqy"
+path="res://.godot/imported/5.png-e6cdfe12afa454420752d97f1badf26f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/one_sushi_bomb/turner.png"
-dest_files=["res://.godot/imported/turner.png-04625508fd8192b863b7a3ce5a67f3cd.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/customer/5.png"
+dest_files=["res://.godot/imported/5.png-e6cdfe12afa454420752d97f1badf26f.ctex"]
 
 [params]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://ckjcxogrfk78l"]
+[gd_scene load_steps=17 format=3 uid="uid://ckjcxogrfk78l"]
 
 [ext_resource type="Script" path="res://OP/cooked_sushi.gd" id="1_bqh2h"]
 [ext_resource type="Texture2D" uid="uid://l4vjael8iiwm" path="res://OP/explode_fish_assets/ciagrette.png" id="2_vhgy6"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://f31ggcigs7mi" path="res://OP/explode_fish_assets/broken_rice_M.png" id="4_ys6sl"]
 [ext_resource type="Texture2D" uid="uid://d07ivavi2mbc3" path="res://OP/explode_fish_assets/broken_rice_S.png" id="5_sqsff"]
 [ext_resource type="Texture2D" uid="uid://byo0u0voenvhi" path="res://OP/explode_fish_assets/cooked fish.png" id="6_qpick"]
+[ext_resource type="AudioStream" uid="uid://d2pdx15yilmj4" path="res://CIOSAI/one_sushi_bomb/explode.wav" id="7_1kleo"]
 
 [sub_resource type="Curve" id="Curve_8uc0d"]
 _data = [Vector2(0, 0.235633), 0.0, 0.0, 0, 0, Vector2(0.461394, 0.44331), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -107,3 +108,7 @@ process_material = SubResource("ParticleProcessMaterial_2wrkj")
 texture = ExtResource("6_qpick")
 one_shot = true
 visibility_rect = Rect2(-500, -500, 1000, 1000)
+
+[node name="Sound" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("7_1kleo")

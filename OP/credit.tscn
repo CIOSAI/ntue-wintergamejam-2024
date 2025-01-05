@@ -1,16 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://c6ly4l7tbbp1t"]
+[gd_scene load_steps=4 format=3 uid="uid://ccimjf48yj2mv"]
 
 [ext_resource type="Script" path="res://OP/credit.gd" id="1_pwldi"]
 [ext_resource type="Texture2D" uid="uid://chm48wy1obnct" path="res://OP/background_light.png" id="2_vwalt"]
-[ext_resource type="Theme" uid="uid://ljp1l4vvr1ba" path="res://OP/title.tres" id="3_rjnss"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_v8y7g"]
-font_size = 30
-outline_size = 6
-outline_color = Color(0, 0, 0, 1)
+[ext_resource type="Theme" path="res://OP/title.tres" id="3_rjnss"]
 
 [node name="Credit" type="Node2D"]
 script = ExtResource("1_pwldi")
+title_scene = "res://OP/title/title.tscn"
 
 [node name="BackgroundLight" type="Sprite2D" parent="."]
 scale = Vector2(0.6, 0.6)
@@ -30,21 +26,27 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("3_rjnss")
 
-[node name="Label" type="Label" parent="CanvasLayer/Control"]
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/Control"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -41.5
-offset_top = -11.5
-offset_right = 41.5
-offset_bottom = 11.5
+offset_left = -158.0
+offset_top = -52.5
+offset_right = 158.0
+offset_bottom = 52.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "123123123"
-label_settings = SubResource("LabelSettings_v8y7g")
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/normal_font_size = 30
+bbcode_enabled = true
+text = "程式：[rainbow]石獅[/rainbow] [wave amp=50.0]小理[/wave]
+美術：[wave amp=50.0]扁不 雪莉[/wave]
+企劃：[wave amp=50.0]魯魯熊 小馬[/wave]"
 
 [node name="Back" type="Button" parent="CanvasLayer/Control"]
 layout_mode = 1

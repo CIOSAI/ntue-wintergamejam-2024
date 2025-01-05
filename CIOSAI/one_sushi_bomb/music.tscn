@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtpfy06n2lq5o"]
+
+[ext_resource type="AudioStream" uid="uid://bg415ajdeo0gf" path="res://CIOSAI/one_sushi_bomb/japaneeese.ogg" id="1_ey1fs"]
+
+[sub_resource type="GDScript" id="GDScript_qdb2r"]
+script/source = "extends Node
+
+func _ready():
+	%Song.play()
+	%Song.finished.connect(func(): %Song.play())
+"
+
+[node name="Music" type="Node"]
+script = SubResource("GDScript_qdb2r")
+
+[node name="Song" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("1_ey1fs")
+volume_db = -27.984

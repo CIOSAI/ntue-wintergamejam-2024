@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://c254loyfr7c7p"]
+[gd_scene load_steps=12 format=3 uid="uid://c254loyfr7c7p"]
 
 [ext_resource type="Texture2D" uid="uid://r6xxmhfrgk42" path="res://CIOSAI/one_sushi_bomb/tuna_plate.png" id="1_v8hml"]
 [ext_resource type="Texture2D" uid="uid://bdyux3ykey4pn" path="res://CIOSAI/one_sushi_bomb/taco_bomb.png" id="2_3yywn"]
+[ext_resource type="Texture2D" uid="uid://nelkpb7s7ii" path="res://CIOSAI/one_sushi_bomb/heart.svg" id="3_naw4q"]
 
 [sub_resource type="GDScript" id="GDScript_v75jx"]
 script/source = "extends CharacterBody2D
@@ -14,6 +15,7 @@ var is_sushi := false :
 		is_sushi = b
 		%Sushi.visible = b
 		%Bomb.visible = not b
+		%Sparks.visible = not b
 var pushed_by = []
 
 func _on_pushed_by_exit_area_exited(area):
@@ -45,6 +47,24 @@ radius = 1.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gfdg0"]
 radius = 35.0
+
+[sub_resource type="Gradient" id="Gradient_6utyp"]
+offsets = PackedFloat32Array(0, 0.524664, 1)
+colors = PackedColorArray(1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_y57ns"]
+gradient = SubResource("Gradient_6utyp")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_qvwux"]
+particle_flag_disable_z = true
+angle_min = -720.0
+angle_max = 720.0
+spread = 180.0
+initial_velocity_max = 29.3
+gravity = Vector3(0, 60, 0)
+scale_min = 0.0
+scale_max = 0.02
+color_ramp = SubResource("GradientTexture1D_y57ns")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_12qre"]
 radius = 23.0
@@ -81,6 +101,14 @@ unique_name_in_owner = true
 visible = false
 scale = Vector2(0.165, 0.165)
 texture = ExtResource("2_3yywn")
+
+[node name="Sparks" type="GPUParticles2D" parent="."]
+unique_name_in_owner = true
+visible = false
+position = Vector2(-6, -26)
+process_material = SubResource("ParticleProcessMaterial_qvwux")
+texture = ExtResource("3_naw4q")
+speed_scale = 3.0
 
 [node name="Collision" type="Area2D" parent="."]
 collision_layer = 0

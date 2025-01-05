@@ -1,0 +1,58 @@
+[gd_scene load_steps=7 format=3 uid="uid://csg6gglyag2b7"]
+
+[ext_resource type="Texture2D" uid="uid://l4vjael8iiwm" path="res://OP/explode_fish_assets/ciagrette.png" id="2_xuwtr"]
+[ext_resource type="AudioStream" uid="uid://d2pdx15yilmj4" path="res://CIOSAI/one_sushi_bomb/explode.wav" id="7_6lo4i"]
+
+[sub_resource type="GDScript" id="GDScript_wnpe0"]
+script/source = "extends Node2D
+
+
+func explode() -> void:
+	for particle: GPUParticles2D in [$Smoke]:
+		particle.emitting = true
+		particle.finished.connect(check_if_commit_die)
+	
+	%Sound.play()
+
+func check_if_commit_die() -> void:
+	var all_done: bool = true
+	for particle: GPUParticles2D in [$Smoke]:
+		if particle.emitting == true:
+			all_done = false
+	
+	if all_done:
+		queue_free()
+"
+
+[sub_resource type="Curve" id="Curve_8uc0d"]
+_data = [Vector2(0, 0.235633), 0.0, 0.0, 0, 0, Vector2(0.461394, 0.44331), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_uv1o3"]
+curve = SubResource("Curve_8uc0d")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dgrk4"]
+particle_flag_disable_z = true
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+gravity = Vector3(0, 98, 0)
+scale_min = 0.5
+scale_max = 1.5
+alpha_curve = SubResource("CurveTexture_uv1o3")
+
+[node name="BombCollision" type="Node2D"]
+script = SubResource("GDScript_wnpe0")
+
+[node name="Smoke" type="GPUParticles2D" parent="."]
+emitting = false
+process_material = SubResource("ParticleProcessMaterial_dgrk4")
+texture = ExtResource("2_xuwtr")
+one_shot = true
+
+[node name="Sound" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("7_6lo4i")

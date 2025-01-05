@@ -6,6 +6,8 @@ func cook() -> void:
 	for particle: GPUParticles2D in [$Smoke, $RiceBig, $RiceMedium, $RiceSmall, $CookedFish]:
 		particle.emitting = true
 		particle.finished.connect(check_if_commit_die)
+	
+	%Sound.play()
 
 func check_if_commit_die() -> void:
 	var all_done: bool = true

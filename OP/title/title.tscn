@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://bxwdymjfd7l8s" path="res://OP/title/title.png" id="1_0nm0w"]
 [ext_resource type="Script" path="res://OP/title/title.gd" id="1_uyub2"]
 [ext_resource type="PackedScene" uid="uid://cwgjp3ksx4v13" path="res://CIOSAI/one_sushi_bomb/main.tscn" id="2_hyyl5"]
-[ext_resource type="PackedScene" uid="uid://c6ly4l7tbbp1t" path="res://OP/credit.tscn" id="3_ajyb5"]
+[ext_resource type="PackedScene" uid="uid://ccimjf48yj2mv" path="res://OP/credit.tscn" id="3_ajyb5"]
 [ext_resource type="Texture2D" uid="uid://bc1c3qeiphcsj" path="res://OP/title/title_title.png" id="3_uf64o"]
 [ext_resource type="FontFile" uid="uid://ccfcsjticljua" path="res://OP/Cubic_11.ttf" id="5_m6p8a"]
 

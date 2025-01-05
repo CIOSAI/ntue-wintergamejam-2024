@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwl5uvt23xuxp"
-path="res://.godot/imported/Kirby_Nintendo.png-3b1fa4b2189592a7d98c3a02cf55555f.ctex"
+uid="uid://cmdj4fkxs66iv"
+path="res://.godot/imported/score_background.png-27104c2b131380aeaec5b7b58c4f579e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/fri/Kirby_Nintendo.png"
-dest_files=["res://.godot/imported/Kirby_Nintendo.png-3b1fa4b2189592a7d98c3a02cf55555f.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/score_background.png"
+dest_files=["res://.godot/imported/score_background.png-27104c2b131380aeaec5b7b58c4f579e.ctex"]
 
 [params]
 

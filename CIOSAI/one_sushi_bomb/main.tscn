@@ -1,25 +1,33 @@
-[gd_scene load_steps=30 format=3 uid="uid://cwgjp3ksx4v13"]
+[gd_scene load_steps=42 format=3 uid="uid://cwgjp3ksx4v13"]
 
 [ext_resource type="PackedScene" uid="uid://i8vo14dhbo80" path="res://CIOSAI/one_sushi_bomb/push_area.tscn" id="1_uw7ma"]
 [ext_resource type="PackedScene" uid="uid://c254loyfr7c7p" path="res://CIOSAI/one_sushi_bomb/food.tscn" id="2_67e18"]
-[ext_resource type="Texture2D" uid="uid://brhl0ek4k7028" path="res://CIOSAI/one_sushi_bomb/background.png" id="2_ikmkr"]
+[ext_resource type="Texture2D" uid="uid://dwen22r6wqmyi" path="res://CIOSAI/one_sushi_bomb/background.png" id="2_ikmkr"]
 [ext_resource type="PackedScene" uid="uid://ckjcxogrfk78l" path="res://OP/cooked_sushi.tscn" id="2_rihwg"]
+[ext_resource type="PackedScene" uid="uid://csg6gglyag2b7" path="res://OP/bomb_collision.tscn" id="3_bimdo"]
 [ext_resource type="Texture2D" uid="uid://d1ie8jcy1q7ad" path="res://CIOSAI/one_sushi_bomb/conveyer_tile.png" id="4_760ei"]
 [ext_resource type="PackedScene" uid="uid://c1sypyvr3d0nv" path="res://CIOSAI/one_sushi_bomb/bin.tscn" id="4_j3qml"]
-[ext_resource type="Texture2D" uid="uid://cdxroramb5bo8" path="res://CIOSAI/one_sushi_bomb/turner.png" id="4_lfjtf"]
+[ext_resource type="Texture2D" uid="uid://llhnpbsmqegc" path="res://CIOSAI/one_sushi_bomb/Sprite_Blood.png" id="5_rwsm2"]
 [ext_resource type="PackedScene" uid="uid://dvqv7jtx4snj0" path="res://CIOSAI/one_sushi_bomb/customer.tscn" id="5_x8s7x"]
+[ext_resource type="Texture2D" uid="uid://ccrfjbffjr8o5" path="res://CIOSAI/one_sushi_bomb/turner.png" id="6_5p1wc"]
+[ext_resource type="AudioStream" uid="uid://dc8h6x5bj8ldd" path="res://CIOSAI/one_sushi_bomb/eat.wav" id="6_e77h5"]
 [ext_resource type="PackedScene" uid="uid://c8cu3m12rko64" path="res://CIOSAI/one_sushi_bomb/boss.tscn" id="9_ud2nv"]
 [ext_resource type="Texture2D" uid="uid://bg4jkvgo7t3so" path="res://CIOSAI/fri/arrow-fat-right-fill.svg" id="10_3y304"]
+[ext_resource type="Texture2D" uid="uid://cmdj4fkxs66iv" path="res://CIOSAI/one_sushi_bomb/score_background.png" id="12_2aju2"]
+[ext_resource type="Texture2D" uid="uid://dqss6o5mne52w" path="res://CIOSAI/one_sushi_bomb/hp_bar_back.png" id="13_hfpuy"]
+[ext_resource type="Texture2D" uid="uid://hpbhej774hh7" path="res://CIOSAI/one_sushi_bomb/hp_bar_value.png" id="14_pv7cr"]
+[ext_resource type="PackedScene" path="res://OP/finish_screen.tscn" id="17_ibaoj"]
 
 [sub_resource type="GDScript" id="GDScript_qgsqv"]
 script/source = "extends Node2D
 
 @export var food_res:PackedScene
 @export var bomb_sushi_res:PackedScene
+@export var bomb_bomb_res:PackedScene
 
 const MAX_HP := 30
 const BOMB_DMG := 10
-const SUSHI_HEAL := 8
+const SUSHI_HEAL := 15
 const HP_DRAIN := 1
 
 var is_left := false :
@@ -45,14 +53,19 @@ var score := 0 :
 var hp := MAX_HP :
 	set(i):
 		hp = clamp(i, 0, MAX_HP)
-		%Customer.show_hp(hp)
+		%HPBar.value = hp
+		if hp<=0:
+			game_over()
 var current_sushi
 
 func _ready():
 	%Timer.start()
 	%HPDrain.start()
 	%Boss.start_timer()
+	
+	%HPBar.max_value = MAX_HP
 	hp = hp
+	
 	reset_customer(get_customer_next_position())
 	await get_tree().create_tween().tween_interval(1).finished
 	spawn_sushi()
@@ -91,7 +104,11 @@ func spawn_sushi():
 	instance.is_sushi = true
 	instance.global_position = get_food_spawn()
 	add_child(instance)
-	instance.tree_exited.connect(spawn_sushi)
+	instance.tree_exited.connect(func():
+		if not is_instance_valid(get_tree()): return
+		await get_tree().create_tween().tween_interval(1).finished
+		spawn_sushi()
+	)
 	current_sushi = instance
 
 func _on_timer_timeout():
@@ -107,15 +124,24 @@ func _on_timer_timeout():
 		if is_instance_valid(current_sushi): current_sushi.queue_free()
 	)
 	instance.bomb_bomb_collided.connect(func(at):
-		pass
+		var effect = bomb_bomb_res.instantiate()
+		effect.global_position = at
+		add_child(effect)
+		effect.explode()
 	)
 
 func _on_customer_eaten(body):
 	if body.is_sushi:
 		score += 1
 		hp += SUSHI_HEAL
+		%EatSound.play()
 	else:
 		hp -= BOMB_DMG
+		%HurtAnim.play(\"default\")
+		var effect = bomb_bomb_res.instantiate()
+		effect.global_position = body.global_position
+		add_child(effect)
+		effect.explode()
 	body.queue_free()
 
 func _on_hp_drain_timeout():
@@ -129,7 +155,50 @@ func _on_boss_table_flip_alert():
 	await %Boss.table_flipped
 	%NextPositionNotice.hide()
 	reset_customer(next_pos)
+
+func game_over():
+	get_tree().paused = true
+	%FinishScoreLayer.show()
+	%FinishScoreLayer.finish(score)
 "
+
+[sub_resource type="Animation" id="Animation_abpaj"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HurtOverlay:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_5af0t"]
+resource_name = "default"
+length = 0.75
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HurtOverlay:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(0.574349, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_iaib3"]
+_data = {
+"RESET": SubResource("Animation_abpaj"),
+"default": SubResource("Animation_5af0t")
+}
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_piu5n"]
 size = Vector2(190, 10)
@@ -320,17 +389,35 @@ _data = {
 "default": SubResource("Animation_3gika")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2ntsp"]
+size = Vector2(540, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rhpto"]
+size = Vector2(10, 540)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ux1c"]
 size = Vector2(180, 10)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_f8nwc"]
-size = Vector2(10, 190)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jycyb"]
 size = Vector2(10, 180)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fr8h6"]
 radius = 5.0
+
+[sub_resource type="Animation" id="Animation_7vfg4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 0.133333, 0.133333, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_7iw83"]
 resource_name = "default"
@@ -346,22 +433,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.2, 0.4),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Color(1, 0.133333, 0.133333, 0.721569), Color(1, 0.133333, 0.133333, 0), Color(1, 0.133333, 0.133333, 0.721569)]
-}
-
-[sub_resource type="Animation" id="Animation_7vfg4"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:self_modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 0.133333, 0.133333, 0.588235)]
+"values": [Color(1, 0.133333, 0.133333, 1), Color(1, 0.133333, 0.133333, 0), Color(1, 0.133333, 0.133333, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_5p603"]
@@ -370,10 +442,14 @@ _data = {
 "default": SubResource("Animation_7iw83")
 }
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_3evw2"]
+atlas = ExtResource("14_pv7cr")
+
 [node name="Main" type="Node2D"]
 script = SubResource("GDScript_qgsqv")
 food_res = ExtResource("2_67e18")
 bomb_sushi_res = ExtResource("2_rihwg")
+bomb_bomb_res = ExtResource("3_bimdo")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = -1
@@ -387,9 +463,27 @@ grow_vertical = 2
 texture = ExtResource("2_ikmkr")
 expand_mode = 2
 
+[node name="HurtOverlay" type="TextureRect" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("5_rwsm2")
+
+[node name="HurtAnim" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_iaib3")
+}
+
+[node name="Sounds" type="Node2D" parent="."]
+
+[node name="EatSound" type="AudioStreamPlayer" parent="Sounds"]
+unique_name_in_owner = true
+stream = ExtResource("6_e77h5")
+
 [node name="LeftRight" type="Node2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(624.985, 348.38)
+position = Vector2(477.985, 348.38)
 scale = Vector2(1.21, 0.795)
 
 [node name="PushArea" parent="LeftRight" instance=ExtResource("1_uw7ma")]
@@ -442,7 +536,7 @@ shape = SubResource("RectangleShape2D_piu5n")
 
 [node name="UpDown" type="Node2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(624.985, 348.38)
+position = Vector2(477.985, 348.38)
 scale = Vector2(1.21, 0.795)
 
 [node name="PushArea" parent="UpDown" instance=ExtResource("1_uw7ma")]
@@ -498,21 +592,21 @@ modulate = Color(0.666667, 0.666667, 0.666667, 1)
 
 [node name="Line2D" type="Line2D" parent="ConveyersLR"]
 texture_repeat = 2
-points = PackedVector2Array(376, 187, 866, 190)
+points = PackedVector2Array(195, 193, 758, 193)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="Line2D2" type="Line2D" parent="ConveyersLR"]
 texture_repeat = 2
-points = PackedVector2Array(376, 350, 869, 349)
+points = PackedVector2Array(187, 350, 771, 350)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="Line2D3" type="Line2D" parent="ConveyersLR"]
 texture_repeat = 2
-points = PackedVector2Array(378, 506, 866, 508)
+points = PackedVector2Array(181, 505, 763, 505)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
@@ -522,27 +616,28 @@ modulate = Color(0.666667, 0.666667, 0.666667, 1)
 
 [node name="Line2D" type="Line2D" parent="ConveyersTD"]
 texture_repeat = 2
-points = PackedVector2Array(382, 183, 380, 519)
+points = PackedVector2Array(236, 150, 238, 548)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="Line2D2" type="Line2D" parent="ConveyersTD"]
 texture_repeat = 2
-points = PackedVector2Array(627, 184, 625, 515)
+points = PackedVector2Array(479, 132, 477, 567)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="Line2D3" type="Line2D" parent="ConveyersTD"]
 texture_repeat = 2
-points = PackedVector2Array(864, 189, 865, 516)
+points = PackedVector2Array(717, 148, 715, 550)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="ConveyersEntranceExit" type="Node2D" parent="."]
 modulate = Color(0.666667, 0.666667, 0.666667, 1)
+position = Vector2(-147, 0)
 
 [node name="Left" type="Node2D" parent="ConveyersEntranceExit"]
 
@@ -562,14 +657,15 @@ texture_mode = 1
 
 [node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Left"]
 texture_repeat = 2
-points = PackedVector2Array(864, 348, 1511, 349)
+points = PackedVector2Array(864, 348, 1242, 349)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
 
 [node name="Right" type="Node2D" parent="ConveyersEntranceExit"]
 position = Vector2(1130, -3)
-scale = Vector2(-1, 1)
+rotation = -3.14159
+scale = Vector2(1, -1)
 
 [node name="Line2D" type="Line2D" parent="ConveyersEntranceExit/Right"]
 texture_repeat = 2
@@ -587,7 +683,7 @@ texture_mode = 1
 
 [node name="Line2D3" type="Line2D" parent="ConveyersEntranceExit/Right"]
 texture_repeat = 2
-points = PackedVector2Array(749, 353, 1576, 355)
+points = PackedVector2Array(749, 353, 928, 353)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
@@ -603,7 +699,7 @@ texture_mode = 1
 
 [node name="Line2D2" type="Line2D" parent="ConveyersEntranceExit/Down"]
 texture_repeat = 2
-points = PackedVector2Array(628, -208, 625, 167)
+points = PackedVector2Array(627, 50, 626, 191)
 width = 30.0
 texture = ExtResource("4_760ei")
 texture_mode = 1
@@ -665,44 +761,44 @@ autoplay = "default"
 [node name="Entrances" type="Node2D" parent="."]
 unique_name_in_owner = true
 modulate = Color(0.666667, 0.666667, 0.666667, 1)
-position = Vector2(624.985, 348.38)
+position = Vector2(477.985, 348.38)
 scale = Vector2(1.21, 0.795)
 
 [node name="Entrance" parent="Entrances" instance=ExtResource("1_uw7ma")]
-position = Vector2(300, 0)
+position = Vector2(475, 0)
 direction = Vector2(-1, 0)
-speed = 50.0
+speed = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance"]
-shape = SubResource("RectangleShape2D_1ux1c")
+shape = SubResource("RectangleShape2D_2ntsp")
 
 [node name="Entrance2" parent="Entrances" instance=ExtResource("1_uw7ma")]
-position = Vector2(-300, 0)
+position = Vector2(-475, 0)
 direction = Vector2(1, 0)
-speed = 50.0
+speed = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance2"]
-shape = SubResource("RectangleShape2D_1ux1c")
+shape = SubResource("RectangleShape2D_2ntsp")
 
 [node name="Entrance3" parent="Entrances" instance=ExtResource("1_uw7ma")]
-position = Vector2(0, 300)
+position = Vector2(0, 475)
 direction = Vector2(0, -1)
-speed = 50.0
+speed = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance3"]
-shape = SubResource("RectangleShape2D_f8nwc")
+shape = SubResource("RectangleShape2D_rhpto")
 
 [node name="Entrance4" parent="Entrances" instance=ExtResource("1_uw7ma")]
-position = Vector2(0, -300)
+position = Vector2(0, -475)
 direction = Vector2(0, 1)
-speed = 50.0
+speed = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Entrances/Entrance4"]
-shape = SubResource("RectangleShape2D_f8nwc")
+shape = SubResource("RectangleShape2D_rhpto")
 
 [node name="Exits" type="Node2D" parent="."]
 modulate = Color(0.666667, 0.666667, 0.666667, 1)
-position = Vector2(624.985, 348.38)
+position = Vector2(477.985, 348.38)
 scale = Vector2(1.21, 0.795)
 
 [node name="Exit" parent="Exits" instance=ExtResource("1_uw7ma")]
@@ -772,9 +868,10 @@ shape = SubResource("RectangleShape2D_jycyb")
 [node name="Distribs" type="Node2D" parent="."]
 unique_name_in_owner = true
 modulate = Color(0.666667, 0.666667, 0.666667, 1)
+position = Vector2(-146.015, 0.38)
 
 [node name="PushArea" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(385, 187)
+position = Vector2(383, 187)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -782,11 +879,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea2" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(625, 187)
+position = Vector2(624, 187)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -794,8 +891,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea2"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea3" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(867, 187)
@@ -806,11 +903,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea3"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea4" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(385, 348)
+position = Vector2(383, 348)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -818,11 +915,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea4"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea5" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(625, 348)
+position = Vector2(624, 348)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -830,8 +927,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea5"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea6" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(867, 348)
@@ -842,11 +939,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea6"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea7" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(385, 506)
+position = Vector2(383, 506)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -854,11 +951,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea7"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea8" parent="Distribs" instance=ExtResource("1_uw7ma")]
-position = Vector2(625, 506)
+position = Vector2(624, 506)
 direction = Vector2(1, 0)
 speed = 100.0
 
@@ -866,8 +963,8 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea8"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="PushArea9" parent="Distribs" instance=ExtResource("1_uw7ma")]
 position = Vector2(867, 506)
@@ -878,10 +975,11 @@ speed = 100.0
 shape = SubResource("CircleShape2D_fr8h6")
 
 [node name="Sprite2D" type="Sprite2D" parent="Distribs/PushArea9"]
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("4_lfjtf")
+scale = Vector2(0.03, 0.03)
+texture = ExtResource("6_5p1wc")
 
 [node name="Bins" type="Node2D" parent="."]
+position = Vector2(-147, 0)
 
 [node name="Bin" parent="Bins" instance=ExtResource("4_j3qml")]
 position = Vector2(234, 192)
@@ -912,20 +1010,19 @@ unique_name_in_owner = true
 wait_time = 5.0
 
 [node name="CustomerLayer" type="Node2D" parent="."]
-position = Vector2(625, 348)
+position = Vector2(478, 348)
 
 [node name="Customer" parent="CustomerLayer" instance=ExtResource("5_x8s7x")]
 unique_name_in_owner = true
 
 [node name="NextPositionNotice" type="Node2D" parent="CustomerLayer"]
 unique_name_in_owner = true
-visible = false
 position = Vector2(-625, -348)
 
 [node name="Sprite2D" type="Sprite2D" parent="CustomerLayer/NextPositionNotice"]
-self_modulate = Color(1, 0.133333, 0.133333, 0.588235)
+self_modulate = Color(1, 0.133333, 0.133333, 1)
 position = Vector2(30, 0)
-scale = Vector2(1.775, 1.775)
+scale = Vector2(2.69, 2.69)
 texture = ExtResource("10_3y304")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CustomerLayer/NextPositionNotice"]
@@ -939,40 +1036,64 @@ unique_name_in_owner = true
 
 [node name="Boss" parent="." instance=ExtResource("9_ud2nv")]
 unique_name_in_owner = true
-position = Vector2(126, 244)
-scale = Vector2(0.240582, 0.240582)
+position = Vector2(1000, 534)
 
 [node name="TableFlipTimer" type="Timer" parent="."]
 unique_name_in_owner = true
 wait_time = 30.0
 one_shot = true
 
-[node name="Panel" type="Panel" parent="."]
-offset_right = 90.0
-offset_bottom = 64.0
+[node name="VBoxContainer" type="HBoxContainer" parent="."]
+offset_right = 1152.0
+offset_bottom = 57.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -25.5
-offset_top = -20.0
-offset_right = 25.5
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Label" type="Label" parent="Panel/HBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
 layout_mode = 2
-text = "分數:"
+size_flags_horizontal = 3
+texture = ExtResource("13_hfpuy")
+expand_mode = 5
 
-[node name="ScoreLabel" type="Label" parent="Panel/HBoxContainer"]
+[node name="HPBar" type="TextureProgressBar" parent="VBoxContainer/TextureRect"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+offset_left = 98.0
+offset_top = 16.0
+offset_right = 421.0
+offset_bottom = 56.0
+size_flags_vertical = 0
+max_value = 1.0
+step = 0.001
+value = 1.0
+nine_patch_stretch = true
+texture_progress = SubResource("AtlasTexture_3evw2")
+
+[node name="Control" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScoreBackground" type="TextureRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+texture = ExtResource("12_2aju2")
+expand_mode = 5
+
+[node name="ScoreLabel" type="Label" parent="VBoxContainer/ScoreBackground"]
 unique_name_in_owner = true
 layout_mode = 2
+offset_left = 92.0
+offset_top = 6.0
+offset_right = 102.0
+offset_bottom = 29.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 26
 text = "0"
+
+[node name="FinishScoreLayer" parent="." instance=ExtResource("17_ibaoj")]
+unique_name_in_owner = true
+process_mode = 3
+layer = 5
+visible = false
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 [connection signal="eaten" from="CustomerLayer/Customer" to="." method="_on_customer_eaten"]

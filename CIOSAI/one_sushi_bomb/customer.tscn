@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://dvqv7jtx4snj0"]
 
 [ext_resource type="Texture2D" uid="uid://cpnlelv8cmu32" path="res://CIOSAI/one_sushi_bomb/table.png" id="1_pdluc"]
-[ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="1_qvbih"]
 [ext_resource type="Texture2D" uid="uid://nelkpb7s7ii" path="res://CIOSAI/one_sushi_bomb/heart.svg" id="2_6wi6k"]
+[ext_resource type="Texture2D" uid="uid://fi2chv2on7l3" path="res://CIOSAI/one_sushi_bomb/customer/1.png" id="2_wyxsk"]
 
 [sub_resource type="GDScript" id="GDScript_n1yjr"]
 script/source = "extends Node2D
@@ -14,8 +14,10 @@ var facing:int = 0 :
 		facing = i
 		%CustomerPivot.position.x = 64.0 if facing%2==0 else 19.0
 		rotation = facing * PI/2
-		%CustomerSprite.rotation = -rotation
+		#%CustomerSprite.rotation = -rotation + PI/2
 
+func _ready():
+	%CustomerSprite.texture = load(\"res://CIOSAI/one_sushi_bomb/customer/\"+str(randi()%5+1)+\".png\")
 
 func _on_customer_collision_body_entered(body):
 	eaten.emit(body)
@@ -44,16 +46,25 @@ rotation = 1.5708
 scale = Vector2(0.165, 0.165)
 texture = ExtResource("1_pdluc")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = 54.0
+offset_top = -20.0
+offset_right = 132.0
+offset_bottom = 20.0
+color = Color(0.392157, 1, 0.243137, 0.588235)
+
 [node name="CustomerPivot" type="Node2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(19, 0)
 
 [node name="CustomerSprite" type="Sprite2D" parent="CustomerPivot"]
 unique_name_in_owner = true
-scale = Vector2(0.175, 0.175)
-texture = ExtResource("1_qvbih")
+rotation = -1.5708
+scale = Vector2(0.015, 0.015)
+texture = ExtResource("2_wyxsk")
 
 [node name="Panel" type="Panel" parent="CustomerPivot/CustomerSprite"]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

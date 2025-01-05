@@ -1,9 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://c8cu3m12rko64"]
+[gd_scene load_steps=12 format=3 uid="uid://c8cu3m12rko64"]
 
 [ext_resource type="Texture2D" uid="uid://3hs0j6iipetb" path="res://CIOSAI/one_sushi_bomb/boss.png" id="1_52wp0"]
 [ext_resource type="Texture2D" uid="uid://dn8j2qla46upi" path="res://CIOSAI/one_sushi_bomb/boss_turn_table_1.png" id="2_n2ts5"]
 [ext_resource type="Texture2D" uid="uid://b2jc408khpg88" path="res://CIOSAI/one_sushi_bomb/boss_turn_table_2.png" id="3_4ana5"]
 [ext_resource type="Texture2D" uid="uid://cpif42vt2r2hl" path="res://CIOSAI/one_sushi_bomb/boss_turn_table_3.png" id="4_ynlpe"]
+[ext_resource type="AudioStream" uid="uid://ba0jqj07n0gt" path="res://CIOSAI/one_sushi_bomb/sifu.wav" id="5_8rwxg"]
+[ext_resource type="AudioStream" uid="uid://ciehjcy4bcbrq" path="res://CIOSAI/one_sushi_bomb/table_flip.wav" id="6_dqdfk"]
+[ext_resource type="AudioStream" uid="uid://h4d5urqyok1a" path="res://CIOSAI/one_sushi_bomb/change_seat_3.mp3" id="7_yvd4n"]
 
 [sub_resource type="GDScript" id="GDScript_qxkuf"]
 script/source = "extends Node2D
@@ -88,6 +91,48 @@ tracks/1/keys = {
 "method": &"table_flip"
 }]
 }
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AlertSound")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(27),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("TableFlipSound")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(30),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("TableFlipSound2")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(30),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [0.0],
+"method": &"play"
+}]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_e236r"]
 _data = {
@@ -106,3 +151,13 @@ unique_name_in_owner = true
 libraries = {
 "": SubResource("AnimationLibrary_e236r")
 }
+
+[node name="AlertSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_8rwxg")
+
+[node name="TableFlipSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_dqdfk")
+
+[node name="TableFlipSound2" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_yvd4n")
+volume_db = 24.0
