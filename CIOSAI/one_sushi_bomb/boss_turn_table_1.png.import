@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brhl0ek4k7028"
-path="res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"
+uid="uid://dn8j2qla46upi"
+path="res://.godot/imported/boss_turn_table_1.png-246a456f140ebd2407f65148a6459a04.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/one_sushi_bomb/background.png"
-dest_files=["res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/boss_turn_table_1.png"
+dest_files=["res://.godot/imported/boss_turn_table_1.png-246a456f140ebd2407f65148a6459a04.ctex"]
 
 [params]
 

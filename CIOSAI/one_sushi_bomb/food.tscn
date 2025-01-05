@@ -1,10 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://c254loyfr7c7p"]
+[gd_scene load_steps=8 format=3 uid="uid://c254loyfr7c7p"]
 
-[ext_resource type="Texture2D" uid="uid://dnnoy7x67grut" path="res://CIOSAI/one_sushi_bomb/sushi_salmon.png" id="1_uggll"]
-[ext_resource type="Texture2D" uid="uid://bngs71y41chs8" path="res://CIOSAI/one_sushi_bomb/bomb-fill.svg" id="2_ld2s8"]
+[ext_resource type="Texture2D" uid="uid://r6xxmhfrgk42" path="res://CIOSAI/one_sushi_bomb/tuna_plate.png" id="1_v8hml"]
+[ext_resource type="Texture2D" uid="uid://bdyux3ykey4pn" path="res://CIOSAI/one_sushi_bomb/taco_bomb.png" id="2_3yywn"]
 
 [sub_resource type="GDScript" id="GDScript_v75jx"]
 script/source = "extends CharacterBody2D
+
+signal bomb_sushi_collided(at)
+signal bomb_bomb_collided(at)
 
 var is_sushi := false :
 	set(b):
@@ -25,15 +28,26 @@ func _physics_process(delta):
 	else:
 		velocity = pushed_by[0][\"vel\"]
 	move_and_slide()
+
+func _on_collision_body_entered(body):
+	if body == self: return
+	if is_sushi: return
+	if body.is_sushi: bomb_sushi_collided.emit(global_position)
+	else: bomb_bomb_collided.emit(global_position)
+	queue_free()
 "
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vsfqh"]
+radius = 17.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_f3t48"]
 radius = 1.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gfdg0"]
-radius = 18.1108
+radius = 35.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_12qre"]
+radius = 23.0
 
 [node name="Food" type="CharacterBody2D"]
 collision_mask = 0
@@ -59,13 +73,21 @@ shape = SubResource("CircleShape2D_gfdg0")
 [node name="Sushi" type="Sprite2D" parent="."]
 unique_name_in_owner = true
 visible = false
-scale = Vector2(0.07, 0.07)
-texture = ExtResource("1_uggll")
+scale = Vector2(0.125, 0.125)
+texture = ExtResource("1_v8hml")
 
 [node name="Bomb" type="Sprite2D" parent="."]
 unique_name_in_owner = true
 visible = false
-texture = ExtResource("2_ld2s8")
+scale = Vector2(0.165, 0.165)
+texture = ExtResource("2_3yywn")
+
+[node name="Collision" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collision"]
+shape = SubResource("CircleShape2D_12qre")
 
 [connection signal="area_entered" from="PushedByEnter" to="." method="_on_pushed_by_enter_area_entered"]
 [connection signal="area_exited" from="PushedByExit" to="." method="_on_pushed_by_exit_area_exited"]
+[connection signal="body_entered" from="Collision" to="." method="_on_collision_body_entered"]

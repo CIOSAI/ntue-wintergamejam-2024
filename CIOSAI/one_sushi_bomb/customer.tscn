@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dvqv7jtx4snj0"]
+[gd_scene load_steps=6 format=3 uid="uid://dvqv7jtx4snj0"]
 
+[ext_resource type="Texture2D" uid="uid://cpnlelv8cmu32" path="res://CIOSAI/one_sushi_bomb/table.png" id="1_pdluc"]
 [ext_resource type="Texture2D" uid="uid://cwl5uvt23xuxp" path="res://CIOSAI/fri/Kirby_Nintendo.png" id="1_qvbih"]
+[ext_resource type="Texture2D" uid="uid://nelkpb7s7ii" path="res://CIOSAI/one_sushi_bomb/heart.svg" id="2_6wi6k"]
 
 [sub_resource type="GDScript" id="GDScript_n1yjr"]
 script/source = "extends Node2D
@@ -10,33 +12,80 @@ signal eaten(body)
 var facing:int = 0 :
 	set(i):
 		facing = i
+		%CustomerPivot.position.x = 64.0 if facing%2==0 else 19.0
 		rotation = facing * PI/2
-		%CustomerSprite.rotation -= rotation
+		%CustomerSprite.rotation = -rotation
 
 
 func _on_customer_collision_body_entered(body):
 	eaten.emit(body)
+
+func show_hp(i:int):
+	%HPLabel.text = str(i)
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c2ath"]
-size = Vector2(20, 160)
+size = Vector2(80, 40)
 
 [node name="Customer" type="Node2D"]
 script = SubResource("GDScript_n1yjr")
 
 [node name="CustomerCollision" type="Area2D" parent="."]
-position = Vector2(100, 0)
+position = Vector2(93, 0)
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CustomerCollision"]
 shape = SubResource("RectangleShape2D_c2ath")
 
+[node name="Sprite2D" type="Sprite2D" parent="CustomerCollision"]
+visible = false
+position = Vector2(-16.39, 0)
+rotation = 1.5708
+scale = Vector2(0.165, 0.165)
+texture = ExtResource("1_pdluc")
+
 [node name="CustomerPivot" type="Node2D" parent="."]
-position = Vector2(48, 0)
+unique_name_in_owner = true
+position = Vector2(19, 0)
 
 [node name="CustomerSprite" type="Sprite2D" parent="CustomerPivot"]
 unique_name_in_owner = true
 scale = Vector2(0.175, 0.175)
 texture = ExtResource("1_qvbih")
+
+[node name="Panel" type="Panel" parent="CustomerPivot/CustomerSprite"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -230.857
+offset_top = -388.5
+offset_right = -99.8571
+offset_bottom = -314.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CustomerPivot/CustomerSprite/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="CustomerPivot/CustomerSprite/Panel/HBoxContainer"]
+self_modulate = Color(0.945098, 0.309804, 0.462745, 1)
+layout_mode = 2
+texture = ExtResource("2_6wi6k")
+expand_mode = 2
+
+[node name="HPLabel" type="Label" parent="CustomerPivot/CustomerSprite/Panel/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 56
+text = "5"
+horizontal_alignment = 2
 
 [connection signal="body_entered" from="CustomerCollision" to="." method="_on_customer_collision_body_entered"]

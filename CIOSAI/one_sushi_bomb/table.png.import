@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://brhl0ek4k7028"
-path="res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"
+uid="uid://cpnlelv8cmu32"
+path="res://.godot/imported/table.png-660b012287ce33a819ab10fe9aea91c2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CIOSAI/one_sushi_bomb/background.png"
-dest_files=["res://.godot/imported/background.png-4c2db6209585b575ea33a8b36904488c.ctex"]
+source_file="res://CIOSAI/one_sushi_bomb/table.png"
+dest_files=["res://.godot/imported/table.png-660b012287ce33a819ab10fe9aea91c2.ctex"]
 
 [params]
 

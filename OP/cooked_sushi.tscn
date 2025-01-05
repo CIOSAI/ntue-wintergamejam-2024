@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://6gbix6eiocdp"]
+[gd_scene load_steps=16 format=3 uid="uid://ckjcxogrfk78l"]
 
 [ext_resource type="Script" path="res://OP/cooked_sushi.gd" id="1_bqh2h"]
 [ext_resource type="Texture2D" uid="uid://l4vjael8iiwm" path="res://OP/explode_fish_assets/ciagrette.png" id="2_vhgy6"]
@@ -66,6 +66,8 @@ direction = Vector3(0, -100, 0)
 initial_velocity_min = 120.0
 initial_velocity_max = 180.0
 gravity = Vector3(0, 98, 0)
+scale_min = 0.25
+scale_max = 0.25
 alpha_curve = SubResource("CurveTexture_ub7x0")
 
 [node name="CookedSushi" type="Node2D"]
