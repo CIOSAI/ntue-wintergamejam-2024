@@ -1,0 +1,231 @@
+[gd_scene load_steps=16 format=3 uid="uid://b3d4n2a5fti0q"]
+
+[ext_resource type="Script" path="res://OP/plate_stack.gd" id="1_57omh"]
+[ext_resource type="Texture2D" uid="uid://be1g0o2prgns7" path="res://OP/finish_assets/gold_plate.png" id="1_uc0e8"]
+[ext_resource type="Script" path="res://OP/plate.gd" id="2_ts1eh"]
+[ext_resource type="Texture2D" uid="uid://hhsc1hwuwadv" path="res://OP/finish_assets/red_plate.png" id="3_ll0nl"]
+[ext_resource type="Texture2D" uid="uid://cg6ncx2xi500n" path="res://OP/finish_assets/white_plate.png" id="4_twrs7"]
+[ext_resource type="Texture2D" uid="uid://dds0by0cxhf5h" path="res://OP/finish_assets/stamp.png" id="6_5cdlo"]
+[ext_resource type="Texture2D" uid="uid://l4vjael8iiwm" path="res://OP/explode_fish_assets/ciagrette.png" id="6_ke71j"]
+[ext_resource type="AudioStream" uid="uid://cfb030jxixqpe" path="res://OP/putting-pot-on-plate.wav" id="8_604s6"]
+[ext_resource type="AudioStream" uid="uid://d04vb4fcm1g8j" path="res://OP/explode_2.mp3" id="9_6nkc2"]
+
+[sub_resource type="Animation" id="Animation_spui8"]
+resource_name = "staaaaammmmmp"
+length = 10.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Stamp/Stamp2:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(829, 383)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Stamp/Stamp2:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.56667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [-0.267035, -12.8334]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Stamp/Stamp2:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.56667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(5, 5), Vector2(0.25, 0.25)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Stamp/Stamp2:modulate")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Stamp/Smoke:emitting")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(1.63333),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Stamp2:playing")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(1.6),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_8unn3"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Stamp/Stamp2:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(829, 383)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Stamp/Stamp2:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.267035]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Stamp/Stamp2:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0.25, 0.25)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Stamp/Stamp2:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Stamp/Smoke:emitting")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Stamp2:playing")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8sol2"]
+_data = {
+"RESET": SubResource("Animation_8unn3"),
+"staaaaammmmmp": SubResource("Animation_spui8")
+}
+
+[sub_resource type="Curve" id="Curve_inaxs"]
+_data = [Vector2(0, 0.235633), 0.0, 0.0, 0, 0, Vector2(0.461394, 0.44331), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_8gmef"]
+curve = SubResource("Curve_inaxs")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_cp1bt"]
+particle_flag_disable_z = true
+angle_min = -180.0
+angle_max = 180.0
+direction = Vector3(0, 0, 0)
+spread = 180.0
+initial_velocity_min = 1000.0
+initial_velocity_max = 10000.0
+gravity = Vector3(0, 98, 0)
+scale_min = 0.5
+scale_max = 1.5
+alpha_curve = SubResource("CurveTexture_8gmef")
+
+[node name="CanvasLayer" type="CanvasLayer"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_8sol2")
+}
+
+[node name="PlateStack" type="Node2D" parent="."]
+position = Vector2(534, 547)
+script = ExtResource("1_57omh")
+
+[node name="Plate" type="Sprite2D" parent="PlateStack"]
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("1_uc0e8")
+script = ExtResource("2_ts1eh")
+possible_sprite = Array[Texture2D]([ExtResource("1_uc0e8"), ExtResource("3_ll0nl"), ExtResource("4_twrs7")])
+
+[node name="Stamp" type="Node2D" parent="."]
+
+[node name="Smoke" type="GPUParticles2D" parent="Stamp"]
+position = Vector2(829, 383)
+rotation = -0.267036
+scale = Vector2(0.25, 0.25)
+emitting = false
+amount = 50
+process_material = SubResource("ParticleProcessMaterial_cp1bt")
+texture = ExtResource("6_ke71j")
+one_shot = true
+explosiveness = 1.0
+
+[node name="Stamp2" type="Sprite2D" parent="Stamp"]
+modulate = Color(1, 1, 1, 0)
+position = Vector2(829, 383)
+rotation = -0.267035
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("6_5cdlo")
+
+[node name="PlateStack2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_604s6")
+
+[node name="Stamp2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_6nkc2")
