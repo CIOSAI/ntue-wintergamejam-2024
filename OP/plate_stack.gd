@@ -6,9 +6,6 @@ extends Node2D
 var plate_coord:= Vector2.ZERO
 var plate_offset:= Vector2(0, -18)
 
-func _ready() -> void:
-	create_stack(6)
-
 func create_stack(count: int) -> void:
 	for i in count:
 		var new_plate: Sprite2D = ref_plate.duplicate()
